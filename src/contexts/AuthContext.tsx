@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserData = async (userId: string) => {
+    console.log('[Auth] Fetching user data for:', userId);
     try {
       // Fetch profile and role in parallel (role may not exist yet)
       const [profileResult, roleResult] = await Promise.all([
@@ -41,13 +42,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .maybeSingle(),
       ]);
 
-      if (profileResult.error) throw profileResult.error;
-      if (roleResult.error) throw roleResult.error;
+      console.log('[Auth] Profile result:', profileResult);
+      console.log('[Auth] Role result:', roleResult);
+
+      // Handle errors gracefully - don't throw, just log and set null
+      if (profileResult.error) {
+        console.error('[Auth] Profile fetch error:', profileResult.error);
+      }
+      if (roleResult.error) {
+        console.error('[Auth] Role fetch error:', roleResult.error);
+      }
 
       setProfile((profileResult.data as Profile | null) ?? null);
       setRole((roleResult.data?.role as AppRole | null) ?? null);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('[Auth] Error fetching user data:', error);
+      // Ensure we set null values on error
+      setProfile(null);
+      setRole(null);
     }
   };
 
