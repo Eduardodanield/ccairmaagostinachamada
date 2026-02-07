@@ -27,37 +27,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (userId: string) => {
     console.log('[Auth] Fetching user data for:', userId);
+
+    // Safety: never hang the app if the backend request stalls
+    const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+      let timeoutId: number | undefined;
+      const timeoutPromise = new Promise<T>((_, reject) => {
+        timeoutId = window.setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+      });
+
+      try {
+        return await Promise.race([promise, timeoutPromise]);
+      } finally {
+        if (timeoutId) window.clearTimeout(timeoutId);
+      }
+    };
+
     try {
-      // Fetch profile and role in parallel (role may not exist yet)
-      const [profileResult, roleResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', userId)
-          .maybeSingle(),
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .maybeSingle(),
+      const fetchPromise = Promise.all([
+        supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle(),
+        supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(),
       ]);
+
+      // 8s timeout to prevent infinite loading on some browsers/extensions
+      const [profileResult, roleResult] = await withTimeout(fetchPromise, 8000, 'fetchUserData');
 
       console.log('[Auth] Profile result:', profileResult);
       console.log('[Auth] Role result:', roleResult);
 
-      // Handle errors gracefully - don't throw, just log and set null
-      if (profileResult.error) {
-        console.error('[Auth] Profile fetch error:', profileResult.error);
-      }
-      if (roleResult.error) {
-        console.error('[Auth] Role fetch error:', roleResult.error);
-      }
+      if (profileResult.error) console.error('[Auth] Profile fetch error:', profileResult.error);
+      if (roleResult.error) console.error('[Auth] Role fetch error:', roleResult.error);
 
       setProfile((profileResult.data as Profile | null) ?? null);
       setRole((roleResult.data?.role as AppRole | null) ?? null);
     } catch (error) {
       console.error('[Auth] Error fetching user data:', error);
-      // Ensure we set null values on error
       setProfile(null);
       setRole(null);
     }
