@@ -65,26 +65,18 @@ export default function AdminTeachers() {
 
   const inviteMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; fullName: string }) => {
-      // Create a new user via admin API (this would typically be an edge function)
-      // For now, we'll use signUp and then assign the role
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: { full_name: data.fullName },
-          emailRedirectTo: window.location.origin,
+      // Use edge function with service role to create user and assign role
+      const { data: result, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: data.email,
+          password: data.password,
+          fullName: data.fullName,
+          role: 'teacher',
         },
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Falha ao criar usuário');
-
-      // Assign teacher role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert([{ user_id: authData.user.id, role: 'teacher' }]);
-
-      if (roleError) throw roleError;
+      if (error) throw error;
+      if (result?.error) throw new Error(result.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teachers'] });
