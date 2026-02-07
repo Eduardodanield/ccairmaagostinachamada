@@ -53,12 +53,12 @@ export default function AdminAttendance() {
           arrival_time,
           is_present,
           hours_attended,
+          recorded_by,
           student:students(
             id,
             name,
             classroom:classrooms(id, name)
-          ),
-          recorder:profiles!attendance_recorded_by_fkey(full_name)
+          )
         `)
         .gte('date', startDate)
         .lte('date', endDate)
