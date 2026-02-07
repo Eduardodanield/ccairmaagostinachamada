@@ -112,29 +112,56 @@ export type Database = {
       students: {
         Row: {
           age: number
+          birth_date: string | null
           classroom_id: string | null
+          cpf: string | null
           created_at: string
+          entry_time: string | null
+          exit_time: string | null
+          gender: string | null
           id: string
           is_archived: boolean
+          mother_name: string | null
           name: string
+          parents_phone: string | null
+          rg: string | null
+          teacher_name: string | null
           updated_at: string
         }
         Insert: {
           age: number
+          birth_date?: string | null
           classroom_id?: string | null
+          cpf?: string | null
           created_at?: string
+          entry_time?: string | null
+          exit_time?: string | null
+          gender?: string | null
           id?: string
           is_archived?: boolean
+          mother_name?: string | null
           name: string
+          parents_phone?: string | null
+          rg?: string | null
+          teacher_name?: string | null
           updated_at?: string
         }
         Update: {
           age?: number
+          birth_date?: string | null
           classroom_id?: string | null
+          cpf?: string | null
           created_at?: string
+          entry_time?: string | null
+          exit_time?: string | null
+          gender?: string | null
           id?: string
           is_archived?: boolean
+          mother_name?: string | null
           name?: string
+          parents_phone?: string | null
+          rg?: string | null
+          teacher_name?: string | null
           updated_at?: string
         }
         Relationships: [
