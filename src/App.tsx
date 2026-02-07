@@ -25,6 +25,7 @@ import AdminAnalytics from "./pages/admin/Analytics";
 import TeacherHome from "./pages/teacher/Home";
 import TeacherAttendance from "./pages/teacher/TakeAttendance";
 import TeacherStats from "./pages/teacher/Stats";
+import TeacherActivities from "./pages/teacher/Activities";
 
 const queryClient = new QueryClient();
 
