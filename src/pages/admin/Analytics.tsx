@@ -18,6 +18,7 @@ import {
   Line,
 } from 'recharts';
 import { format, subDays, eachDayOfInterval } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const COLORS = ['hsl(217, 91%, 50%)', 'hsl(142, 76%, 36%)', 'hsl(38, 92%, 50%)', 'hsl(0, 84%, 60%)'];
 
@@ -72,8 +73,8 @@ export default function AdminAnalytics() {
         const rate = total > 0 ? Math.round((present / total) * 100) : 0;
 
         return {
-          day: format(day, 'EEE'),
-          date: format(day, 'MMM d'),
+          day: format(day, 'EEE', { locale: ptBR }),
+          date: format(day, "d 'de' MMM", { locale: ptBR }),
           rate,
           present,
           total,
@@ -94,20 +95,20 @@ export default function AdminAnalytics() {
       const absent = (attendance?.length || 0) - present;
 
       return [
-        { name: 'Present', value: present },
-        { name: 'Absent', value: absent },
+        { name: 'Presentes', value: present },
+        { name: 'Ausentes', value: absent },
       ];
     },
   });
 
   return (
-    <AdminLayout title="Analytics" description="Attendance insights and trends">
+    <AdminLayout title="Relatórios" description="Análises e tendências de frequência">
       <div className="grid gap-6 md:grid-cols-2">
         {/* Weekly Trend */}
         <Card className="col-span-2">
           <CardHeader>
-            <CardTitle>Weekly Attendance Trend</CardTitle>
-            <CardDescription>Attendance rate over the past 7 days</CardDescription>
+            <CardTitle>Tendência Semanal de Frequência</CardTitle>
+            <CardDescription>Taxa de presença nos últimos 7 dias</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingTrend ? (
@@ -124,7 +125,7 @@ export default function AdminAnalytics() {
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                     }}
-                    formatter={(value: number) => [`${value}%`, 'Attendance Rate']}
+                    formatter={(value: number) => [`${value}%`, 'Taxa de Presença']}
                     labelFormatter={(label, payload) => payload?.[0]?.payload?.date || label}
                   />
                   <Line
@@ -143,8 +144,8 @@ export default function AdminAnalytics() {
         {/* Attendance by Classroom */}
         <Card>
           <CardHeader>
-            <CardTitle>Attendance by Classroom</CardTitle>
-            <CardDescription>Last 30 days comparison</CardDescription>
+            <CardTitle>Frequência por Sala</CardTitle>
+            <CardDescription>Comparativo dos últimos 30 dias</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingClassroom ? (
@@ -161,14 +162,14 @@ export default function AdminAnalytics() {
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                     }}
-                    formatter={(value: number) => [`${value}%`, 'Rate']}
+                    formatter={(value: number) => [`${value}%`, 'Taxa']}
                   />
                   <Bar dataKey="rate" fill="hsl(217, 91%, 50%)" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                No data available
+                Nenhum dado disponível
               </div>
             )}
           </CardContent>
@@ -177,8 +178,8 @@ export default function AdminAnalytics() {
         {/* Overall Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Overall Distribution</CardTitle>
-            <CardDescription>Present vs Absent (last 30 days)</CardDescription>
+            <CardTitle>Distribuição Geral</CardTitle>
+            <CardDescription>Presentes vs Ausentes (últimos 30 dias)</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -211,7 +212,7 @@ export default function AdminAnalytics() {
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                No attendance data yet
+                Nenhum dado de frequência ainda
               </div>
             )}
           </CardContent>

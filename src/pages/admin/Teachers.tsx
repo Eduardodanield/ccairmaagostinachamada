@@ -77,7 +77,7 @@ export default function AdminTeachers() {
       });
 
       if (authError) throw authError;
-      if (!authData.user) throw new Error('Failed to create user');
+      if (!authData.user) throw new Error('Falha ao criar usuário');
 
       // Assign teacher role
       const { error: roleError } = await supabase
@@ -93,12 +93,12 @@ export default function AdminTeachers() {
       setFullName('');
       setPassword('');
       toast({ 
-        title: 'Teacher invited successfully',
-        description: 'They will receive an email to verify their account.',
+        title: 'Professor convidado com sucesso',
+        description: 'A conta foi criada e está pronta para uso.',
       });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to invite teacher', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao convidar professor', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -112,10 +112,10 @@ export default function AdminTeachers() {
     },
     onSuccess: (_, { isActive }) => {
       queryClient.invalidateQueries({ queryKey: ['teachers'] });
-      toast({ title: isActive ? 'Teacher activated' : 'Teacher deactivated' });
+      toast({ title: isActive ? 'Professor ativado' : 'Professor desativado' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to update teacher', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao atualizar professor', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -125,31 +125,31 @@ export default function AdminTeachers() {
   };
 
   return (
-    <AdminLayout title="Teachers" description="Manage teacher accounts">
+    <AdminLayout title="Professores" description="Gerenciar contas de professores">
       {/* Actions Bar */}
       <div className="flex justify-end mb-6">
         <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { setEmail(''); setFullName(''); setPassword(''); }}>
               <UserPlus className="h-4 w-4 mr-2" />
-              Invite Teacher
+              Convidar Professor
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Invite New Teacher</DialogTitle>
+              <DialogTitle>Convidar Novo Professor</DialogTitle>
               <DialogDescription>
-                Create a new teacher account. They will receive an email to verify their account.
+                Crie uma nova conta de professor. A conta estará pronta para uso imediatamente.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleInvite} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Nome Completo</Label>
                 <Input
                   id="fullName"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="John Smith"
+                  placeholder="Maria Silva"
                   required
                 />
               </div>
@@ -160,12 +160,12 @@ export default function AdminTeachers() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="teacher@school.edu"
+                  placeholder="professor@escola.com.br"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Temporary Password</Label>
+                <Label htmlFor="password">Senha Temporária</Label>
                 <Input
                   id="password"
                   type="password"
@@ -176,12 +176,12 @@ export default function AdminTeachers() {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  The teacher can change this after logging in.
+                  O professor pode alterar a senha após fazer login.
                 </p>
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={inviteMutation.isPending}>
-                  {inviteMutation.isPending ? 'Creating...' : 'Create Account'}
+                  {inviteMutation.isPending ? 'Criando...' : 'Criar Conta'}
                 </Button>
               </DialogFooter>
             </form>
@@ -194,10 +194,10 @@ export default function AdminTeachers() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
+              <TableHead>Nome</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -217,7 +217,7 @@ export default function AdminTeachers() {
                   <TableCell>{teacher.email}</TableCell>
                   <TableCell>
                     <Badge variant={teacher.is_active ? 'default' : 'secondary'}>
-                      {teacher.is_active ? 'Active' : 'Inactive'}
+                      {teacher.is_active ? 'Ativo' : 'Inativo'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -234,12 +234,12 @@ export default function AdminTeachers() {
                       {teacher.is_active ? (
                         <>
                           <UserX className="h-4 w-4 mr-2" />
-                          Deactivate
+                          Desativar
                         </>
                       ) : (
                         <>
                           <UserCheck className="h-4 w-4 mr-2" />
-                          Activate
+                          Ativar
                         </>
                       )}
                     </Button>
@@ -249,7 +249,7 @@ export default function AdminTeachers() {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                  No teachers found. Invite your first teacher!
+                  Nenhum professor encontrado. Convide seu primeiro professor!
                 </TableCell>
               </TableRow>
             )}
