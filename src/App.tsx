@@ -2,11 +2,132 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+
+// Pages
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
+// Admin Pages
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminStudents from "./pages/admin/Students";
+import AdminClassrooms from "./pages/admin/Classrooms";
+import AdminTeachers from "./pages/admin/Teachers";
+import AdminAttendance from "./pages/admin/Attendance";
+import AdminAnalytics from "./pages/admin/Analytics";
+
+// Teacher Pages
+import TeacherHome from "./pages/teacher/Home";
+import TeacherAttendance from "./pages/teacher/TakeAttendance";
+import TeacherStats from "./pages/teacher/Stats";
+
 const queryClient = new QueryClient();
+
+function AppRoutes() {
+  const { role, isLoading } = useAuth();
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      
+      {/* Root redirect based on role */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            {role === 'director' ? (
+              <Navigate to="/admin" replace />
+            ) : (
+              <Navigate to="/teacher" replace />
+            )}
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={['director']}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/students"
+        element={
+          <ProtectedRoute allowedRoles={['director']}>
+            <AdminStudents />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/classrooms"
+        element={
+          <ProtectedRoute allowedRoles={['director']}>
+            <AdminClassrooms />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/teachers"
+        element={
+          <ProtectedRoute allowedRoles={['director']}>
+            <AdminTeachers />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/attendance"
+        element={
+          <ProtectedRoute allowedRoles={['director']}>
+            <AdminAttendance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/analytics"
+        element={
+          <ProtectedRoute allowedRoles={['director']}>
+            <AdminAnalytics />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Teacher Routes */}
+      <Route
+        path="/teacher"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherHome />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/attendance/:classroomId"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherAttendance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/stats"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherStats />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Catch-all */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,11 +135,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
