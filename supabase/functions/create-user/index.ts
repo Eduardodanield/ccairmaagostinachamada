@@ -13,9 +13,25 @@ serve(async (req) => {
   }
 
   try {
-    const { email, password, fullName, role } = await req.json();
+    // Verify caller is authenticated and is a director
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("Não autorizado: header de autorização ausente");
+    }
 
-    // Create admin client with service role
+    // Create client with caller's token to verify identity
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user: caller }, error: callerError } = await supabaseClient.auth.getUser();
+    if (callerError || !caller) {
+      throw new Error("Não autorizado: usuário não autenticado");
+    }
+
+    // Create admin client to check role and create user
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -26,6 +42,25 @@ serve(async (req) => {
         },
       }
     );
+
+    // Verify caller is a director
+    const { data: roleData, error: roleCheckError } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", caller.id)
+      .single();
+
+    if (roleCheckError || roleData?.role !== "director") {
+      throw new Error("Acesso negado: apenas diretores podem criar usuários");
+    }
+
+    // Parse request body
+    const { email, password, fullName, role } = await req.json();
+
+    // Validate role - only allow 'teacher' to be created via this endpoint
+    if (role !== "teacher") {
+      throw new Error("Apenas contas de professor podem ser criadas por este endpoint");
+    }
 
     // Create user
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -40,7 +75,7 @@ serve(async (req) => {
     }
 
     if (!userData.user) {
-      throw new Error("Failed to create user");
+      throw new Error("Falha ao criar usuário");
     }
 
     // Assign role
