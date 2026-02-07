@@ -257,7 +257,8 @@ export default function AdminDashboard() {
                 {classroomsWithoutAttendance.map((classroom) => (
                   <div
                     key={classroom.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"
+                    onClick={() => handleClassroomClick(classroom.id)}
+                    className="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
                   >
                     <div>
                       <p className="font-semibold text-orange-800 dark:text-orange-300">
