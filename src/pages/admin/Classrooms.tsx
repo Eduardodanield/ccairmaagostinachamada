@@ -35,6 +35,7 @@ export default function AdminClassrooms() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(null);
   const [name, setName] = useState('');
 
