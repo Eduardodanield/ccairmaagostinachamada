@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users, School, ClipboardCheck, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export default function AdminDashboard() {
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -51,12 +52,12 @@ export default function AdminDashboard() {
   });
 
   return (
-    <AdminLayout title="Dashboard" description="Overview of your school's attendance">
+    <AdminLayout title="Painel" description="Visão geral da frequência da escola">
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
+            <CardTitle className="text-sm font-medium">Total de Alunos</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -65,13 +66,13 @@ export default function AdminDashboard() {
             ) : (
               <div className="text-2xl font-bold">{stats?.totalStudents}</div>
             )}
-            <p className="text-xs text-muted-foreground">Active students enrolled</p>
+            <p className="text-xs text-muted-foreground">Alunos ativos matriculados</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Classrooms</CardTitle>
+            <CardTitle className="text-sm font-medium">Salas de Aula</CardTitle>
             <School className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -80,13 +81,13 @@ export default function AdminDashboard() {
             ) : (
               <div className="text-2xl font-bold">{stats?.totalClassrooms}</div>
             )}
-            <p className="text-xs text-muted-foreground">Active classrooms</p>
+            <p className="text-xs text-muted-foreground">Salas ativas</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Present Today</CardTitle>
+            <CardTitle className="text-sm font-medium">Presentes Hoje</CardTitle>
             <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -95,13 +96,13 @@ export default function AdminDashboard() {
             ) : (
               <div className="text-2xl font-bold">{stats?.presentToday}</div>
             )}
-            <p className="text-xs text-muted-foreground">Students present today</p>
+            <p className="text-xs text-muted-foreground">Alunos presentes hoje</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Taxa de Presença</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
             ) : (
               <div className="text-2xl font-bold">{stats?.attendanceRate}%</div>
             )}
-            <p className="text-xs text-muted-foreground">Today's attendance</p>
+            <p className="text-xs text-muted-foreground">Frequência de hoje</p>
           </CardContent>
         </Card>
       </div>
@@ -118,8 +119,8 @@ export default function AdminDashboard() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Attendance</CardTitle>
-          <CardDescription>Latest attendance records</CardDescription>
+          <CardTitle>Frequência Recente</CardTitle>
+          <CardDescription>Últimos registros de frequência</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoadingRecent ? (
@@ -138,7 +139,7 @@ export default function AdminDashboard() {
                   <div>
                     <p className="font-medium">{record.student?.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {record.student?.classroom?.name} • {format(new Date(record.date), 'MMM d, yyyy')}
+                      {record.student?.classroom?.name} • {format(new Date(record.date), "d 'de' MMM, yyyy", { locale: ptBR })}
                     </p>
                   </div>
                   <div className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -146,14 +147,14 @@ export default function AdminDashboard() {
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                       : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                   }`}>
-                    {record.is_present ? 'Present' : 'Absent'}
+                    {record.is_present ? 'Presente' : 'Ausente'}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <p className="text-muted-foreground text-center py-8">
-              No attendance records yet. Start by adding students and taking attendance.
+              Nenhum registro de frequência ainda. Comece adicionando alunos e registrando a frequência.
             </p>
           )}
         </CardContent>

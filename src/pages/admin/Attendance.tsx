@@ -22,6 +22,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { format, subDays } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import type { Classroom } from '@/types/database';
 
 export default function AdminAttendance() {
@@ -79,17 +80,17 @@ export default function AdminAttendance() {
   });
 
   return (
-    <AdminLayout title="Attendance Records" description="View and filter attendance history">
+    <AdminLayout title="Registros de Frequência" description="Visualizar e filtrar histórico de frequência">
       {/* Filters */}
       <div className="grid gap-4 sm:grid-cols-3 mb-6">
         <div className="space-y-2">
-          <Label>Classroom</Label>
+          <Label>Sala</Label>
           <Select value={filterClassroom} onValueChange={setFilterClassroom}>
             <SelectTrigger>
-              <SelectValue placeholder="All classrooms" />
+              <SelectValue placeholder="Todas as salas" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Classrooms</SelectItem>
+              <SelectItem value="all">Todas as Salas</SelectItem>
               {classrooms?.map((classroom) => (
                 <SelectItem key={classroom.id} value={classroom.id}>
                   {classroom.name}
@@ -99,7 +100,7 @@ export default function AdminAttendance() {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Start Date</Label>
+          <Label>Data Inicial</Label>
           <Input
             type="date"
             value={startDate}
@@ -107,7 +108,7 @@ export default function AdminAttendance() {
           />
         </div>
         <div className="space-y-2">
-          <Label>End Date</Label>
+          <Label>Data Final</Label>
           <Input
             type="date"
             value={endDate}
@@ -121,13 +122,13 @@ export default function AdminAttendance() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Student</TableHead>
-              <TableHead>Classroom</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Aluno</TableHead>
+              <TableHead>Sala</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Arrival Time</TableHead>
-              <TableHead>Hours</TableHead>
-              <TableHead>Recorded By</TableHead>
+              <TableHead>Hora de Chegada</TableHead>
+              <TableHead>Horas</TableHead>
+              <TableHead>Registrado Por</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -146,16 +147,16 @@ export default function AdminAttendance() {
             ) : attendance && attendance.length > 0 ? (
               attendance.map((record: any) => (
                 <TableRow key={record.id}>
-                  <TableCell>{format(new Date(record.date), 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{format(new Date(record.date), "d 'de' MMM, yyyy", { locale: ptBR })}</TableCell>
                   <TableCell className="font-medium">{record.student?.name}</TableCell>
                   <TableCell>{record.student?.classroom?.name || '—'}</TableCell>
                   <TableCell>
                     <Badge variant={record.is_present ? 'default' : 'secondary'}>
-                      {record.is_present ? 'Present' : 'Absent'}
+                      {record.is_present ? 'Presente' : 'Ausente'}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {record.arrival_time ? format(new Date(`1970-01-01T${record.arrival_time}`), 'h:mm a') : '—'}
+                    {record.arrival_time ? format(new Date(`1970-01-01T${record.arrival_time}`), 'HH:mm') : '—'}
                   </TableCell>
                   <TableCell>{record.hours_attended}h</TableCell>
                   <TableCell>{record.recorder?.full_name || '—'}</TableCell>
@@ -164,7 +165,7 @@ export default function AdminAttendance() {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  No attendance records found for the selected filters.
+                  Nenhum registro de frequência encontrado para os filtros selecionados.
                 </TableCell>
               </TableRow>
             )}

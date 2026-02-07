@@ -27,8 +27,8 @@ export default function Login() {
 
     if (error) {
       toast({
-        title: 'Login Failed',
-        description: error.message,
+        title: 'Falha no Login',
+        description: 'Email ou senha incorretos.',
         variant: 'destructive',
       });
       setIsLoading(false);
@@ -36,12 +36,10 @@ export default function Login() {
     }
 
     toast({
-      title: 'Welcome back!',
-      description: 'You have successfully logged in.',
+      title: 'Bem-vindo(a)!',
+      description: 'Login realizado com sucesso.',
     });
 
-    // Redirect based on role will happen automatically via ProtectedRoute
-    // For now, redirect to the attempted page or home
     navigate(from, { replace: true });
   };
 
@@ -52,8 +50,8 @@ export default function Login() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <GraduationCap className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold">School Attendance</CardTitle>
-          <CardDescription>Sign in to your account to continue</CardDescription>
+          <CardTitle className="text-2xl font-bold">Controle de Frequência</CardTitle>
+          <CardDescription>Entre com sua conta para continuar</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,7 +60,7 @@ export default function Login() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@school.edu"
+                placeholder="voce@escola.com.br"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -70,7 +68,7 @@ export default function Login() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -83,7 +81,7 @@ export default function Login() {
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
+              Entrar
             </Button>
           </form>
         </CardContent>

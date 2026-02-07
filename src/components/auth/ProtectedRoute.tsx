@@ -33,9 +33,9 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Access Pending</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Acesso Pendente</h1>
           <p className="text-muted-foreground">
-            Your account is awaiting role assignment. Please contact your administrator.
+            Sua conta está aguardando atribuição de função. Por favor, entre em contato com o administrador.
           </p>
         </div>
       </div>

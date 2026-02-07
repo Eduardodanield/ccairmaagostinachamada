@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Users, CheckCircle2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import type { Classroom } from '@/types/database';
 
 export default function TeacherHome() {
@@ -64,10 +65,10 @@ export default function TeacherHome() {
   };
 
   return (
-    <TeacherLayout title="Select Class">
+    <TeacherLayout title="Selecionar Turma">
       <div className="p-4">
         <p className="text-muted-foreground mb-4">
-          {format(new Date(), 'EEEE, MMMM d, yyyy')}
+          {format(new Date(), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })}
         </p>
 
         {isLoading ? (
@@ -94,7 +95,7 @@ export default function TeacherHome() {
                     <CardTitle className="text-lg">{classroom.name}</CardTitle>
                     <CardDescription className="flex items-center gap-1 mt-1">
                       <Users className="h-3 w-3" />
-                      {classroom.studentCount} students
+                      {classroom.studentCount} alunos
                     </CardDescription>
                   </div>
                   {classroom.studentCount > 0 && (
@@ -105,7 +106,7 @@ export default function TeacherHome() {
                       {classroom.isComplete ? (
                         <span className="flex items-center gap-1">
                           <CheckCircle2 className="h-3 w-3" />
-                          Complete
+                          Completo
                         </span>
                       ) : (
                         <span className="flex items-center gap-1">
@@ -123,7 +124,7 @@ export default function TeacherHome() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground text-center">
-                No classrooms available. Please contact your administrator.
+                Nenhuma turma disponível. Por favor, entre em contato com o administrador.
               </p>
             </CardContent>
           </Card>

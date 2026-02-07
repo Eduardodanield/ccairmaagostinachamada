@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Home, ClipboardList, BarChart2, LogOut, GraduationCap } from 'lucide-react';
 
 const navItems = [
-  { title: 'Classes', url: '/teacher', icon: Home },
-  { title: 'My Stats', url: '/teacher/stats', icon: BarChart2 },
+  { title: 'Turmas', url: '/teacher', icon: Home },
+  { title: 'Estatísticas', url: '/teacher/stats', icon: BarChart2 },
 ];
 
 interface TeacherLayoutProps {
@@ -34,12 +34,12 @@ export function TeacherLayout({ children, title, showBack, onBack }: TeacherLayo
         <div className="flex h-full items-center px-4">
           {showBack ? (
             <Button variant="ghost" size="sm" onClick={onBack} className="mr-2">
-              ← Back
+              ← Voltar
             </Button>
           ) : (
             <div className="flex items-center gap-2 mr-4">
               <GraduationCap className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-sm">Attendance</span>
+              <span className="font-semibold text-sm">Frequência</span>
             </div>
           )}
           <h1 className="text-lg font-semibold flex-1">{title}</h1>

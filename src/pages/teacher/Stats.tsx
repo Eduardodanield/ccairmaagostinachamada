@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export default function TeacherStats() {
   const { user } = useAuth();
@@ -59,13 +60,13 @@ export default function TeacherStats() {
   });
 
   return (
-    <TeacherLayout title="My Stats">
+    <TeacherLayout title="Minhas Estatísticas">
       <div className="p-4">
         {/* Weekly Summary */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>This Week</CardTitle>
-            <CardDescription>Your attendance recording summary</CardDescription>
+            <CardTitle>Esta Semana</CardTitle>
+            <CardDescription>Resumo dos seus registros de frequência</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -78,28 +79,28 @@ export default function TeacherStats() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-lg bg-muted">
                   <p className="text-2xl font-bold">{weeklyStats.total}</p>
-                  <p className="text-sm text-muted-foreground">Total Records</p>
+                  <p className="text-sm text-muted-foreground">Total de Registros</p>
                 </div>
                 <div className="p-4 rounded-lg bg-muted">
                   <p className="text-2xl font-bold">{weeklyStats.rate}%</p>
-                  <p className="text-sm text-muted-foreground">Attendance Rate</p>
+                  <p className="text-sm text-muted-foreground">Taxa de Presença</p>
                 </div>
                 <div className="p-4 rounded-lg bg-success/10">
                   <p className="text-2xl font-bold text-success">
                     {weeklyStats.present}
                   </p>
-                  <p className="text-sm text-success/80">Present</p>
+                  <p className="text-sm text-success/80">Presentes</p>
                 </div>
                 <div className="p-4 rounded-lg bg-destructive/10">
                   <p className="text-2xl font-bold text-destructive">
                     {weeklyStats.absent}
                   </p>
-                  <p className="text-sm text-destructive/80">Absent</p>
+                  <p className="text-sm text-destructive/80">Ausentes</p>
                 </div>
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-4">
-                No records this week yet.
+                Nenhum registro esta semana ainda.
               </p>
             )}
           </CardContent>
@@ -108,8 +109,8 @@ export default function TeacherStats() {
         {/* Recent Records */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Records</CardTitle>
-            <CardDescription>Attendance you've recorded</CardDescription>
+            <CardTitle>Registros Recentes</CardTitle>
+            <CardDescription>Frequências que você registrou</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingRecent ? (
@@ -128,18 +129,18 @@ export default function TeacherStats() {
                     <div>
                       <p className="font-medium">{record.student?.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {record.student?.classroom?.name} • {format(new Date(record.date), 'MMM d')}
+                        {record.student?.classroom?.name} • {format(new Date(record.date), "d 'de' MMM", { locale: ptBR })}
                       </p>
                     </div>
                     <Badge variant={record.is_present ? 'default' : 'secondary'}>
-                      {record.is_present ? 'Present' : 'Absent'}
+                      {record.is_present ? 'Presente' : 'Ausente'}
                     </Badge>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                No attendance records yet. Start by taking attendance for a class.
+                Nenhum registro de frequência ainda. Comece registrando a frequência de uma turma.
               </p>
             )}
           </CardContent>

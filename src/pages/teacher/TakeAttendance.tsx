@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import type { Student, Classroom, AttendanceFormData } from '@/types/database';
 
 interface AttendanceState {
@@ -121,12 +122,12 @@ export default function TeacherAttendance() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classrooms-with-status'] });
       queryClient.invalidateQueries({ queryKey: ['existing-attendance'] });
-      toast({ title: 'Attendance submitted successfully!' });
+      toast({ title: 'Frequência registrada com sucesso!' });
       navigate('/teacher');
     },
     onError: (error: Error) => {
       toast({
-        title: 'Failed to submit attendance',
+        title: 'Falha ao registrar frequência',
         description: error.message,
         variant: 'destructive',
       });
@@ -174,15 +175,15 @@ export default function TeacherAttendance() {
 
   return (
     <TeacherLayout
-      title={classroom?.name || 'Loading...'}
+      title={classroom?.name || 'Carregando...'}
       showBack
       onBack={() => navigate('/teacher')}
     >
       <div className="p-4 pb-24">
         <div className="flex items-center justify-between mb-4">
-          <p className="text-muted-foreground">{format(new Date(), 'MMMM d, yyyy')}</p>
+          <p className="text-muted-foreground">{format(new Date(), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
           <p className="text-sm font-medium">
-            {presentCount}/{totalCount} present
+            {presentCount}/{totalCount} presentes
           </p>
         </div>
 
@@ -204,11 +205,11 @@ export default function TeacherAttendance() {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium">{student.name}</p>
-                      <p className="text-sm text-muted-foreground">Age: {student.age}</p>
+                      <p className="text-sm text-muted-foreground">Idade: {student.age}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">
-                        {attendanceState[student.id]?.isPresent ? 'Present' : 'Absent'}
+                        {attendanceState[student.id]?.isPresent ? 'Presente' : 'Ausente'}
                       </span>
                       <Switch
                         checked={attendanceState[student.id]?.isPresent ?? false}
@@ -220,7 +221,7 @@ export default function TeacherAttendance() {
                   {attendanceState[student.id]?.isPresent && (
                     <div className="flex items-center gap-2 pt-2 border-t">
                       <Label htmlFor={`time-${student.id}`} className="text-sm whitespace-nowrap">
-                        Arrival:
+                        Chegada:
                       </Label>
                       <Input
                         id={`time-${student.id}`}
@@ -239,7 +240,7 @@ export default function TeacherAttendance() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground text-center">
-                No students in this classroom.
+                Nenhum aluno nesta turma.
               </p>
             </CardContent>
           </Card>
@@ -254,7 +255,7 @@ export default function TeacherAttendance() {
             onClick={() => setIsConfirmOpen(true)}
             disabled={submitMutation.isPending}
           >
-            {submitMutation.isPending ? 'Submitting...' : 'Submit Attendance'}
+            {submitMutation.isPending ? 'Enviando...' : 'Registrar Frequência'}
           </Button>
         </div>
       )}
@@ -263,16 +264,16 @@ export default function TeacherAttendance() {
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Attendance</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar Frequência</AlertDialogTitle>
             <AlertDialogDescription>
-              You are about to submit attendance for {classroom?.name}.
+              Você está prestes a registrar a frequência da {classroom?.name}.
               <br />
-              <strong>{presentCount}</strong> students present, <strong>{totalCount - presentCount}</strong> absent.
+              <strong>{presentCount}</strong> alunos presentes, <strong>{totalCount - presentCount}</strong> ausentes.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSubmit}>Confirm</AlertDialogAction>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSubmit}>Confirmar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

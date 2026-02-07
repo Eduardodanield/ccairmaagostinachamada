@@ -28,12 +28,12 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
-  { title: 'Students', url: '/admin/students', icon: Users },
-  { title: 'Classrooms', url: '/admin/classrooms', icon: School },
-  { title: 'Teachers', url: '/admin/teachers', icon: UserCog },
-  { title: 'Attendance', url: '/admin/attendance', icon: ClipboardList },
-  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'Painel', url: '/admin', icon: LayoutDashboard },
+  { title: 'Alunos', url: '/admin/students', icon: Users },
+  { title: 'Salas', url: '/admin/classrooms', icon: School },
+  { title: 'Professores', url: '/admin/teachers', icon: UserCog },
+  { title: 'Frequência', url: '/admin/attendance', icon: ClipboardList },
+  { title: 'Relatórios', url: '/admin/analytics', icon: BarChart3 },
 ];
 
 function AdminSidebar() {
@@ -50,11 +50,11 @@ function AdminSidebar() {
     <Sidebar className="border-r border-sidebar-border">
       <div className="flex h-16 items-center border-b border-sidebar-border px-4">
         <GraduationCap className="h-6 w-6 text-sidebar-primary mr-2" />
-        <span className="font-semibold text-sidebar-foreground">Attendance</span>
+        <span className="font-semibold text-sidebar-foreground">Frequência</span>
       </div>
       <SidebarContent className="flex flex-col h-[calc(100vh-4rem)]">
         <SidebarGroup className="flex-1">
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>Navegação</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
@@ -79,7 +79,7 @@ function AdminSidebar() {
         <div className="p-4 border-t border-sidebar-border">
           <div className="mb-3 px-2">
             <p className="text-sm font-medium text-sidebar-foreground truncate">
-              {profile?.full_name || 'Director'}
+              {profile?.full_name || 'Diretor'}
             </p>
             <p className="text-xs text-muted-foreground truncate">
               {profile?.email}
@@ -91,7 +91,7 @@ function AdminSidebar() {
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
+            Sair
           </Button>
         </div>
       </SidebarContent>

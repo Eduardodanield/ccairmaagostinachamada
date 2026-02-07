@@ -98,10 +98,10 @@ export default function AdminStudents() {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       setIsAddOpen(false);
       resetForm();
-      toast({ title: 'Student added successfully' });
+      toast({ title: 'Aluno adicionado com sucesso' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to add student', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao adicionar aluno', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -115,10 +115,10 @@ export default function AdminStudents() {
       setIsEditOpen(false);
       setSelectedStudent(null);
       resetForm();
-      toast({ title: 'Student updated successfully' });
+      toast({ title: 'Aluno atualizado com sucesso' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to update student', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao atualizar aluno', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -134,10 +134,10 @@ export default function AdminStudents() {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       setIsArchiveOpen(false);
       setSelectedStudent(null);
-      toast({ title: archive ? 'Student archived' : 'Student restored' });
+      toast({ title: archive ? 'Aluno arquivado' : 'Aluno restaurado' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to archive student', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao arquivar aluno', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -184,13 +184,13 @@ export default function AdminStudents() {
   });
 
   return (
-    <AdminLayout title="Students" description="Manage student records">
+    <AdminLayout title="Alunos" description="Gerenciar cadastro de alunos">
       {/* Actions Bar */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search students..."
+            placeholder="Buscar alunos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -198,10 +198,10 @@ export default function AdminStudents() {
         </div>
         <Select value={filterClassroom} onValueChange={setFilterClassroom}>
           <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filter by classroom" />
+            <SelectValue placeholder="Filtrar por sala" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Classrooms</SelectItem>
+            <SelectItem value="all">Todas as Salas</SelectItem>
             {classrooms?.map((classroom) => (
               <SelectItem key={classroom.id} value={classroom.id}>
                 {classroom.name}
@@ -213,23 +213,23 @@ export default function AdminStudents() {
           variant="outline"
           onClick={() => setShowArchived(!showArchived)}
         >
-          {showArchived ? 'Show Active' : 'Show Archived'}
+          {showArchived ? 'Ver Ativos' : 'Ver Arquivados'}
         </Button>
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
             <Button onClick={resetForm}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Student
+              Adicionar Aluno
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add New Student</DialogTitle>
-              <DialogDescription>Enter the student's details below.</DialogDescription>
+              <DialogTitle>Adicionar Novo Aluno</DialogTitle>
+              <DialogDescription>Preencha os dados do aluno abaixo.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAdd} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">Nome</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -238,7 +238,7 @@ export default function AdminStudents() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="age">Age</Label>
+                <Label htmlFor="age">Idade</Label>
                 <Input
                   id="age"
                   type="number"
@@ -250,13 +250,13 @@ export default function AdminStudents() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="classroom">Classroom</Label>
+                <Label htmlFor="classroom">Sala</Label>
                 <Select
                   value={formData.classroom_id}
                   onValueChange={(value) => setFormData({ ...formData, classroom_id: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a classroom" />
+                    <SelectValue placeholder="Selecione uma sala" />
                   </SelectTrigger>
                   <SelectContent>
                     {classrooms?.map((classroom) => (
@@ -269,7 +269,7 @@ export default function AdminStudents() {
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={addMutation.isPending}>
-                  {addMutation.isPending ? 'Adding...' : 'Add Student'}
+                  {addMutation.isPending ? 'Adicionando...' : 'Adicionar Aluno'}
                 </Button>
               </DialogFooter>
             </form>
@@ -282,10 +282,10 @@ export default function AdminStudents() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>Classroom</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Nome</TableHead>
+              <TableHead>Idade</TableHead>
+              <TableHead>Sala</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -334,7 +334,7 @@ export default function AdminStudents() {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                  {showArchived ? 'No archived students found.' : 'No students found. Add your first student!'}
+                  {showArchived ? 'Nenhum aluno arquivado encontrado.' : 'Nenhum aluno encontrado. Adicione seu primeiro aluno!'}
                 </TableCell>
               </TableRow>
             )}
@@ -346,12 +346,12 @@ export default function AdminStudents() {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Student</DialogTitle>
-            <DialogDescription>Update the student's details.</DialogDescription>
+            <DialogTitle>Editar Aluno</DialogTitle>
+            <DialogDescription>Atualize os dados do aluno.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEdit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Name</Label>
+              <Label htmlFor="edit-name">Nome</Label>
               <Input
                 id="edit-name"
                 value={formData.name}
@@ -360,7 +360,7 @@ export default function AdminStudents() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-age">Age</Label>
+              <Label htmlFor="edit-age">Idade</Label>
               <Input
                 id="edit-age"
                 type="number"
@@ -372,13 +372,13 @@ export default function AdminStudents() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-classroom">Classroom</Label>
+              <Label htmlFor="edit-classroom">Sala</Label>
               <Select
                 value={formData.classroom_id}
                 onValueChange={(value) => setFormData({ ...formData, classroom_id: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a classroom" />
+                  <SelectValue placeholder="Selecione uma sala" />
                 </SelectTrigger>
                 <SelectContent>
                   {classrooms?.map((classroom) => (
@@ -391,7 +391,7 @@ export default function AdminStudents() {
             </div>
             <DialogFooter>
               <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                {updateMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </DialogFooter>
           </form>
@@ -403,16 +403,16 @@ export default function AdminStudents() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {selectedStudent?.is_archived ? 'Restore Student?' : 'Archive Student?'}
+              {selectedStudent?.is_archived ? 'Restaurar Aluno?' : 'Arquivar Aluno?'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {selectedStudent?.is_archived
-                ? `This will restore "${selectedStudent?.name}" to active students.`
-                : `This will archive "${selectedStudent?.name}". Their attendance history will be preserved.`}
+                ? `Isso irá restaurar "${selectedStudent?.name}" para os alunos ativos.`
+                : `Isso irá arquivar "${selectedStudent?.name}". O histórico de frequência será preservado.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() =>
                 selectedStudent &&
@@ -422,7 +422,7 @@ export default function AdminStudents() {
                 })
               }
             >
-              {selectedStudent?.is_archived ? 'Restore' : 'Archive'}
+              {selectedStudent?.is_archived ? 'Restaurar' : 'Arquivar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

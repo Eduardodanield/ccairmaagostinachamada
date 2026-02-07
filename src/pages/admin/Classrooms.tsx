@@ -80,10 +80,10 @@ export default function AdminClassrooms() {
       queryClient.invalidateQueries({ queryKey: ['classrooms'] });
       setIsAddOpen(false);
       setName('');
-      toast({ title: 'Classroom created successfully' });
+      toast({ title: 'Sala criada com sucesso' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to create classroom', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao criar sala', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -98,10 +98,10 @@ export default function AdminClassrooms() {
       setIsEditOpen(false);
       setSelectedClassroom(null);
       setName('');
-      toast({ title: 'Classroom updated successfully' });
+      toast({ title: 'Sala atualizada com sucesso' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to update classroom', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao atualizar sala', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -115,10 +115,10 @@ export default function AdminClassrooms() {
       queryClient.invalidateQueries({ queryKey: ['classrooms'] });
       setIsDeleteOpen(false);
       setSelectedClassroom(null);
-      toast({ title: 'Classroom deleted successfully' });
+      toast({ title: 'Sala excluída com sucesso' });
     },
     onError: (error: Error) => {
-      toast({ title: 'Failed to delete classroom', description: error.message, variant: 'destructive' });
+      toast({ title: 'Falha ao excluir sala', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -140,35 +140,35 @@ export default function AdminClassrooms() {
   };
 
   return (
-    <AdminLayout title="Classrooms" description="Manage your school's classrooms">
+    <AdminLayout title="Salas de Aula" description="Gerenciar as salas da escola">
       {/* Actions Bar */}
       <div className="flex justify-end mb-6">
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setName('')}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Classroom
+              Adicionar Sala
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add New Classroom</DialogTitle>
-              <DialogDescription>Enter the classroom name below.</DialogDescription>
+              <DialogTitle>Adicionar Nova Sala</DialogTitle>
+              <DialogDescription>Digite o nome da sala abaixo.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAdd} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Classroom Name</Label>
+                <Label htmlFor="name">Nome da Sala</Label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Grade 1A"
+                  placeholder="Ex: Turma 1A"
                   required
                 />
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={addMutation.isPending}>
-                  {addMutation.isPending ? 'Creating...' : 'Create Classroom'}
+                  {addMutation.isPending ? 'Criando...' : 'Criar Sala'}
                 </Button>
               </DialogFooter>
             </form>
@@ -197,7 +197,7 @@ export default function AdminClassrooms() {
                   <CardTitle className="text-lg">{classroom.name}</CardTitle>
                   <CardDescription className="flex items-center gap-1 mt-1">
                     <Users className="h-3 w-3" />
-                    {classroom.studentCount} students
+                    {classroom.studentCount} alunos
                   </CardDescription>
                 </div>
                 <div className="flex gap-1">
@@ -226,10 +226,10 @@ export default function AdminClassrooms() {
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground mb-4">No classrooms found. Create your first classroom!</p>
+            <p className="text-muted-foreground mb-4">Nenhuma sala encontrada. Crie sua primeira sala!</p>
             <Button onClick={() => { setName(''); setIsAddOpen(true); }}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Classroom
+              Adicionar Sala
             </Button>
           </CardContent>
         </Card>
@@ -239,12 +239,12 @@ export default function AdminClassrooms() {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Classroom</DialogTitle>
-            <DialogDescription>Update the classroom name.</DialogDescription>
+            <DialogTitle>Editar Sala</DialogTitle>
+            <DialogDescription>Atualize o nome da sala.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEdit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Classroom Name</Label>
+              <Label htmlFor="edit-name">Nome da Sala</Label>
               <Input
                 id="edit-name"
                 value={name}
@@ -254,7 +254,7 @@ export default function AdminClassrooms() {
             </div>
             <DialogFooter>
               <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                {updateMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </DialogFooter>
           </form>
@@ -265,19 +265,19 @@ export default function AdminClassrooms() {
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Classroom?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir Sala?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will delete "{selectedClassroom?.name}". Students in this classroom will be unassigned.
-              This action cannot be undone.
+              Isso irá excluir "{selectedClassroom?.name}". Os alunos desta sala ficarão sem sala atribuída.
+              Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => selectedClassroom && deleteMutation.mutate(selectedClassroom.id)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
