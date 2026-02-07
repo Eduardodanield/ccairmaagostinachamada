@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +10,12 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const today = format(new Date(), 'yyyy-MM-dd');
+
+  const handleClassroomClick = (classroomId: string) => {
+    navigate(`/admin/attendance?classroom=${classroomId}`);
+  };
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -195,7 +201,8 @@ export default function AdminDashboard() {
                 {classroomsWithAttendance.map((classroom) => (
                   <div
                     key={classroom.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                    onClick={() => handleClassroomClick(classroom.id)}
+                    className="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
                   >
                     <div>
                       <p className="font-semibold text-green-800 dark:text-green-300">
@@ -250,7 +257,8 @@ export default function AdminDashboard() {
                 {classroomsWithoutAttendance.map((classroom) => (
                   <div
                     key={classroom.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"
+                    onClick={() => handleClassroomClick(classroom.id)}
+                    className="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
                   >
                     <div>
                       <p className="font-semibold text-orange-800 dark:text-orange-300">

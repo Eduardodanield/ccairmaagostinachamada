@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { Input } from '@/components/ui/input';
@@ -26,7 +27,10 @@ import { ptBR } from 'date-fns/locale';
 import type { Classroom } from '@/types/database';
 
 export default function AdminAttendance() {
-  const [filterClassroom, setFilterClassroom] = useState<string>('all');
+  const [searchParams] = useSearchParams();
+  const classroomFromUrl = searchParams.get('classroom');
+  
+  const [filterClassroom, setFilterClassroom] = useState<string>(classroomFromUrl || 'all');
   const [startDate, setStartDate] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
@@ -127,7 +131,6 @@ export default function AdminAttendance() {
               <TableHead>Sala</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Hora de Chegada</TableHead>
-              <TableHead>Horas</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -157,12 +160,11 @@ export default function AdminAttendance() {
                   <TableCell>
                     {record.arrival_time ? format(new Date(`1970-01-01T${record.arrival_time}`), 'HH:mm') : '—'}
                   </TableCell>
-                  <TableCell>{record.hours_attended}h</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   Nenhum registro de frequência encontrado para os filtros selecionados.
                 </TableCell>
               </TableRow>
