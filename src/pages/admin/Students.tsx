@@ -63,7 +63,7 @@ interface StudentWithDetails {
   teacher_name: string | null;
   entry_time: string | null;
   exit_time: string | null;
-  classroom: Classroom | null;
+  classroom: { id: string; name: string } | null;
 }
 
 const initialFormData = {
