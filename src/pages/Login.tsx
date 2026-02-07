@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Loader2 } from 'lucide-react';
+import loginBackground from '@/assets/login-background.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
