@@ -53,12 +53,12 @@ export default function AdminAttendance() {
           arrival_time,
           is_present,
           hours_attended,
+          recorded_by,
           student:students(
             id,
             name,
             classroom:classrooms(id, name)
-          ),
-          recorder:profiles!attendance_recorded_by_fkey(full_name)
+          )
         `)
         .gte('date', startDate)
         .lte('date', endDate)
@@ -128,7 +128,6 @@ export default function AdminAttendance() {
               <TableHead>Status</TableHead>
               <TableHead>Hora de Chegada</TableHead>
               <TableHead>Horas</TableHead>
-              <TableHead>Registrado Por</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -159,12 +158,11 @@ export default function AdminAttendance() {
                     {record.arrival_time ? format(new Date(`1970-01-01T${record.arrival_time}`), 'HH:mm') : '—'}
                   </TableCell>
                   <TableCell>{record.hours_attended}h</TableCell>
-                  <TableCell>{record.recorder?.full_name || '—'}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Nenhum registro de frequência encontrado para os filtros selecionados.
                 </TableCell>
               </TableRow>
