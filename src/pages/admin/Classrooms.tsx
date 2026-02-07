@@ -206,6 +206,17 @@ export default function AdminClassrooms() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    title="Gerar relatório PDF"
+                    onClick={() => {
+                      setSelectedClassroom(classroom);
+                      setIsReportOpen(true);
+                    }}
+                  >
+                    <FileText className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => openEditDialog(classroom)}
                   >
                     <Pencil className="h-4 w-4" />
