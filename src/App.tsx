@@ -126,6 +126,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/activities"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherActivities />
+          </ProtectedRoute>
+        }
+      />
       
       {/* Catch-all */}
       <Route path="*" element={<NotFound />} />

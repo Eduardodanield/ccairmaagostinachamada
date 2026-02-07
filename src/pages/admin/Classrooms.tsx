@@ -295,6 +295,16 @@ export default function AdminClassrooms() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* PDF Report Dialog */}
+      {selectedClassroom && (
+        <ClassroomReportPDF
+          classroomId={selectedClassroom.id}
+          classroomName={selectedClassroom.name}
+          open={isReportOpen}
+          onOpenChange={setIsReportOpen}
+        />
+      )}
     </AdminLayout>
   );
 }
