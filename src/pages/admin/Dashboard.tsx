@@ -10,7 +10,12 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const today = format(new Date(), 'yyyy-MM-dd');
+
+  const handleClassroomClick = (classroomId: string) => {
+    navigate(`/admin/attendance?classroom=${classroomId}`);
+  };
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
