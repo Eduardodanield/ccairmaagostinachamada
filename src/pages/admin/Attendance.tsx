@@ -127,7 +127,6 @@ export default function AdminAttendance() {
               <TableHead>Sala</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Hora de Chegada</TableHead>
-              <TableHead>Horas</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
