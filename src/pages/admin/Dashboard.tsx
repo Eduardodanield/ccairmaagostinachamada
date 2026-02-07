@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, School, ClipboardCheck, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Users, School, ClipboardCheck, TrendingUp, CheckCircle2, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -13,11 +14,10 @@ export default function AdminDashboard() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const [studentsRes, classroomsRes, todayAttendanceRes, totalStudentsRes] = await Promise.all([
+      const [studentsRes, classroomsRes, todayAttendanceRes] = await Promise.all([
         supabase.from('students').select('id', { count: 'exact' }).eq('is_archived', false),
         supabase.from('classrooms').select('id', { count: 'exact' }),
         supabase.from('attendance').select('id, is_present').eq('date', today),
-        supabase.from('students').select('id', { count: 'exact' }).eq('is_archived', false),
       ]);
 
       const presentToday = todayAttendanceRes.data?.filter(a => a.is_present).length || 0;
@@ -33,23 +33,77 @@ export default function AdminDashboard() {
     },
   });
 
-  const { data: recentAttendance, isLoading: isLoadingRecent } = useQuery({
-    queryKey: ['recent-attendance'],
+  // Fetch classrooms with today's attendance status
+  const { data: classroomStatus, isLoading: isLoadingClassrooms } = useQuery({
+    queryKey: ['classroom-attendance-status', today],
     queryFn: async () => {
-      const { data } = await supabase
+      // Get all classrooms
+      const { data: classrooms } = await supabase
+        .from('classrooms')
+        .select('id, name')
+        .order('name');
+
+      // Get today's attendance grouped by student's classroom
+      const { data: todayAttendance } = await supabase
         .from('attendance')
-        .select(`
-          id,
-          date,
-          is_present,
-          arrival_time,
-          student:students(name, classroom:classrooms(name))
-        `)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      return data || [];
+        .select('student_id, is_present, student:students(classroom_id)')
+        .eq('date', today);
+
+      // Get student count per classroom
+      const { data: students } = await supabase
+        .from('students')
+        .select('classroom_id')
+        .eq('is_archived', false);
+
+      // Build classroom status map
+      const classroomMap = new Map<string, {
+        id: string;
+        name: string;
+        totalStudents: number;
+        presentCount: number;
+        absentCount: number;
+        hasAttendance: boolean;
+      }>();
+
+      classrooms?.forEach(c => {
+        classroomMap.set(c.id, {
+          id: c.id,
+          name: c.name,
+          totalStudents: 0,
+          presentCount: 0,
+          absentCount: 0,
+          hasAttendance: false,
+        });
+      });
+
+      // Count students per classroom
+      students?.forEach(s => {
+        if (s.classroom_id && classroomMap.has(s.classroom_id)) {
+          const classroom = classroomMap.get(s.classroom_id)!;
+          classroom.totalStudents++;
+        }
+      });
+
+      // Count attendance per classroom
+      todayAttendance?.forEach((record: any) => {
+        const classroomId = record.student?.classroom_id;
+        if (classroomId && classroomMap.has(classroomId)) {
+          const classroom = classroomMap.get(classroomId)!;
+          classroom.hasAttendance = true;
+          if (record.is_present) {
+            classroom.presentCount++;
+          } else {
+            classroom.absentCount++;
+          }
+        }
+      });
+
+      return Array.from(classroomMap.values());
     },
   });
+
+  const classroomsWithAttendance = classroomStatus?.filter(c => c.hasAttendance) || [];
+  const classroomsWithoutAttendance = classroomStatus?.filter(c => !c.hasAttendance) || [];
 
   return (
     <AdminLayout title="Painel" description="Visão geral da frequência da escola">
@@ -116,49 +170,113 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Frequência Recente</CardTitle>
-          <CardDescription>Últimos registros de frequência</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoadingRecent ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          ) : recentAttendance && recentAttendance.length > 0 ? (
-            <div className="space-y-4">
-              {recentAttendance.map((record: any) => (
-                <div
-                  key={record.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                >
-                  <div>
-                    <p className="font-medium">{record.student?.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {record.student?.classroom?.name} • {format(new Date(record.date), "d 'de' MMM, yyyy", { locale: ptBR })}
-                    </p>
+      {/* Classroom Status Grid */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Classrooms WITH Attendance */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              Salas com Chamada Hoje
+            </CardTitle>
+            <CardDescription>
+              {classroomsWithAttendance.length} sala(s) com frequência registrada
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingClassrooms ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : classroomsWithAttendance.length > 0 ? (
+              <div className="space-y-3">
+                {classroomsWithAttendance.map((classroom) => (
+                  <div
+                    key={classroom.id}
+                    className="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                  >
+                    <div>
+                      <p className="font-semibold text-green-800 dark:text-green-300">
+                        {classroom.name}
+                      </p>
+                      <p className="text-sm text-green-600 dark:text-green-400">
+                        {classroom.totalStudents} aluno(s) na sala
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Badge variant="default" className="bg-green-600">
+                        {classroom.presentCount} Presentes
+                      </Badge>
+                      {classroom.absentCount > 0 && (
+                        <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                          {classroom.absentCount} Ausentes
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    record.is_present 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                  }`}>
-                    {record.is_present ? 'Presente' : 'Ausente'}
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <CheckCircle2 className="h-12 w-12 mx-auto mb-2 opacity-20" />
+                <p>Nenhuma sala com chamada registrada hoje</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Classrooms WITHOUT Attendance */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-orange-500" />
+              Salas sem Chamada Hoje
+            </CardTitle>
+            <CardDescription>
+              {classroomsWithoutAttendance.length} sala(s) pendente(s)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingClassrooms ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : classroomsWithoutAttendance.length > 0 ? (
+              <div className="space-y-3">
+                {classroomsWithoutAttendance.map((classroom) => (
+                  <div
+                    key={classroom.id}
+                    className="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"
+                  >
+                    <div>
+                      <p className="font-semibold text-orange-800 dark:text-orange-300">
+                        {classroom.name}
+                      </p>
+                      <p className="text-sm text-orange-600 dark:text-orange-400">
+                        {classroom.totalStudents} aluno(s) na sala
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="border-orange-300 text-orange-700 dark:border-orange-600 dark:text-orange-400">
+                      Pendente
+                    </Badge>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8">
-              Nenhum registro de frequência ainda. Comece adicionando alunos e registrando a frequência.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <CheckCircle2 className="h-12 w-12 mx-auto mb-2 text-green-500" />
+                <p className="text-green-600 dark:text-green-400 font-medium">
+                  Todas as salas com chamada! 🎉
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </AdminLayout>
   );
 }
