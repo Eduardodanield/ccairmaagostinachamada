@@ -5,7 +5,7 @@ import { TeacherLayout } from '@/components/layouts/TeacherLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { format, subDays, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
 
 export default function TeacherStats() {
   const { user } = useAuth();
@@ -84,17 +84,17 @@ export default function TeacherStats() {
                   <p className="text-2xl font-bold">{weeklyStats.rate}%</p>
                   <p className="text-sm text-muted-foreground">Attendance Rate</p>
                 </div>
-                <div className="p-4 rounded-lg bg-green-100 dark:bg-green-900/30">
-                  <p className="text-2xl font-bold text-green-700 dark:text-green-400">
+                <div className="p-4 rounded-lg bg-success/10">
+                  <p className="text-2xl font-bold text-success">
                     {weeklyStats.present}
                   </p>
-                  <p className="text-sm text-green-600 dark:text-green-500">Present</p>
+                  <p className="text-sm text-success/80">Present</p>
                 </div>
-                <div className="p-4 rounded-lg bg-red-100 dark:bg-red-900/30">
-                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">
+                <div className="p-4 rounded-lg bg-destructive/10">
+                  <p className="text-2xl font-bold text-destructive">
                     {weeklyStats.absent}
                   </p>
-                  <p className="text-sm text-red-600 dark:text-red-500">Absent</p>
+                  <p className="text-sm text-destructive/80">Absent</p>
                 </div>
               </div>
             ) : (
