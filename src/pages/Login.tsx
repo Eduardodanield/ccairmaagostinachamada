@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Loader2 } from 'lucide-react';
+import loginBackground from '@/assets/login-background.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -92,8 +93,17 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center p-4 overflow-hidden">
+      {/* Background Image with Fade In */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-fade-in"
+        style={{ backgroundImage: `url(${loginBackground})` }}
+      />
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-black/40" />
+      
+      {/* Login Card */}
+      <Card className="relative z-10 w-full max-w-md animate-scale-in bg-background/95 backdrop-blur-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <GraduationCap className="h-8 w-8 text-primary" />
