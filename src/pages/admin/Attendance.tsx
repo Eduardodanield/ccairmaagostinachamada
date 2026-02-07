@@ -158,7 +158,6 @@ export default function AdminAttendance() {
                     {record.arrival_time ? format(new Date(`1970-01-01T${record.arrival_time}`), 'HH:mm') : '—'}
                   </TableCell>
                   <TableCell>{record.hours_attended}h</TableCell>
-                  <TableCell>{record.recorder?.full_name || '—'}</TableCell>
                 </TableRow>
               ))
             ) : (
