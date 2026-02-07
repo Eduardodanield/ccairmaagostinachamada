@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/layouts/AdminLayout';
 import { Input } from '@/components/ui/input';
@@ -26,7 +27,10 @@ import { ptBR } from 'date-fns/locale';
 import type { Classroom } from '@/types/database';
 
 export default function AdminAttendance() {
-  const [filterClassroom, setFilterClassroom] = useState<string>('all');
+  const [searchParams] = useSearchParams();
+  const classroomFromUrl = searchParams.get('classroom');
+  
+  const [filterClassroom, setFilterClassroom] = useState<string>(classroomFromUrl || 'all');
   const [startDate, setStartDate] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
