@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserData = async (userId: string) => {
+    console.log('[Auth] Fetching user data for:', userId);
     try {
       // Fetch profile and role in parallel (role may not exist yet)
       const [profileResult, roleResult] = await Promise.all([
@@ -41,35 +42,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .maybeSingle(),
       ]);
 
-      if (profileResult.error) throw profileResult.error;
-      if (roleResult.error) throw roleResult.error;
+      console.log('[Auth] Profile result:', profileResult);
+      console.log('[Auth] Role result:', roleResult);
+
+      // Handle errors gracefully - don't throw, just log and set null
+      if (profileResult.error) {
+        console.error('[Auth] Profile fetch error:', profileResult.error);
+      }
+      if (roleResult.error) {
+        console.error('[Auth] Role fetch error:', roleResult.error);
+      }
 
       setProfile((profileResult.data as Profile | null) ?? null);
       setRole((roleResult.data?.role as AppRole | null) ?? null);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('[Auth] Error fetching user data:', error);
+      // Ensure we set null values on error
+      setProfile(null);
+      setRole(null);
     }
   };
 
   useEffect(() => {
     let isMounted = true;
+    console.log('[Auth] Initializing auth context...');
 
     // Set up auth state listener BEFORE checking session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('[Auth] Auth state changed:', event, session?.user?.email);
         if (!isMounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await fetchUserData(session.user.id);
+          try {
+            await fetchUserData(session.user.id);
+          } catch (error) {
+            console.error('[Auth] Error in onAuthStateChange fetchUserData:', error);
+          }
         } else {
           setProfile(null);
           setRole(null);
         }
         
         if (isMounted) {
+          console.log('[Auth] Setting isLoading to false (from onAuthStateChange)');
           setIsLoading(false);
         }
       }
@@ -77,19 +96,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Then check for existing session
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!isMounted) return;
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchUserData(session.user.id);
-      }
-      
-      if (isMounted) {
-        setIsLoading(false);
+      console.log('[Auth] Getting existing session...');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('[Auth] Error getting session:', error);
+        }
+        
+        console.log('[Auth] Existing session:', session?.user?.email ?? 'none');
+        
+        if (!isMounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          try {
+            await fetchUserData(session.user.id);
+          } catch (error) {
+            console.error('[Auth] Error fetching user data:', error);
+          }
+        }
+      } catch (error) {
+        console.error('[Auth] Critical error in initializeAuth:', error);
+      } finally {
+        if (isMounted) {
+          console.log('[Auth] Setting isLoading to false (from initializeAuth)');
+          setIsLoading(false);
+        }
       }
     };
 
