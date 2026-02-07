@@ -65,23 +65,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
+    console.log('[Auth] Initializing auth context...');
 
     // Set up auth state listener BEFORE checking session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('[Auth] Auth state changed:', event, session?.user?.email);
         if (!isMounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await fetchUserData(session.user.id);
+          try {
+            await fetchUserData(session.user.id);
+          } catch (error) {
+            console.error('[Auth] Error in onAuthStateChange fetchUserData:', error);
+          }
         } else {
           setProfile(null);
           setRole(null);
         }
         
         if (isMounted) {
+          console.log('[Auth] Setting isLoading to false (from onAuthStateChange)');
           setIsLoading(false);
         }
       }
@@ -89,19 +96,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Then check for existing session
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!isMounted) return;
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchUserData(session.user.id);
-      }
-      
-      if (isMounted) {
-        setIsLoading(false);
+      console.log('[Auth] Getting existing session...');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('[Auth] Error getting session:', error);
+        }
+        
+        console.log('[Auth] Existing session:', session?.user?.email ?? 'none');
+        
+        if (!isMounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          try {
+            await fetchUserData(session.user.id);
+          } catch (error) {
+            console.error('[Auth] Error fetching user data:', error);
+          }
+        }
+      } catch (error) {
+        console.error('[Auth] Critical error in initializeAuth:', error);
+      } finally {
+        if (isMounted) {
+          console.log('[Auth] Setting isLoading to false (from initializeAuth)');
+          setIsLoading(false);
+        }
       }
     };
 
