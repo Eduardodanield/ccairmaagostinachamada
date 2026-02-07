@@ -35,7 +35,7 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
-      
+      <Route path="/reset-password" element={<ResetPassword />} />
       {/* Root redirect based on role */}
       <Route
         path="/"
