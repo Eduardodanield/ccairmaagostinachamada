@@ -1,122 +1,110 @@
 
 
-## School Attendance Web App - Implementation Plan
+# Plano para Resolver Tela Branca
 
-### Overview
-A cloud-based SaaS application with two distinct interfaces: a desktop-optimized Director Dashboard for administration and a mobile-first Teacher Interface for daily attendance taking.
+## Resumo do Problema
+A aplicacao mostra uma tela completamente branca antes mesmo de chegar na tela de login. No meu ambiente de teste, a aplicacao funciona corretamente (redireciona para `/login` quando nao ha usuario logado), indicando que o problema pode estar relacionado a:
+1. Cache/sessao corrompida no seu navegador
+2. Erro silencioso que nao aparece nos logs
+3. Estado inconsistente do AuthContext
 
----
-
-### Phase 1: Database Foundation
-
-**Tables to Create:**
-1. **user_roles** - Secure role management (director/teacher) separate from profiles
-2. **profiles** - User profile data (name, email, linked to auth.users)
-3. **classrooms** - Class information (id, name, created_at)
-4. **students** - Student records (id, name, age, classroom_id, is_archived, created_at)
-5. **attendance** - Daily attendance logs (id, student_id, date, arrival_time, is_present, hours_attended, recorded_by, created_at)
-
-**Security (RLS Policies):**
-- Directors: Full CRUD access on all tables
-- Teachers: Read-only on students/classrooms, Insert/Read on attendance
-- Automatic assignment of fixed hours (configurable, default 8 hours) when marked present
+## Diagnostico Realizado
+- **Banco de dados OK**: Seu usuario `edwardpf02@gmail.com` tem role `director` corretamente atribuido
+- **Codigo parece correto**: `AuthContext.tsx` usa `maybeSingle()` para evitar erros 406
+- **Teste funcionando**: No browser de teste, a aplicacao carrega e redireciona para login
 
 ---
 
-### Phase 2: Authentication & Role System
+## Solucao Proposta
 
-**Features:**
-- Email/password login via Supabase Auth
-- Automatic profile creation on signup
-- Role-based routing (Directors → Admin Dashboard, Teachers → Mobile Interface)
-- Protected routes based on user role
-- Director ability to invite/create teacher accounts
+### Passo 1: Adicionar Tratamento de Erro Global
+Adicionar um handler de erro nao tratado no `App.tsx` para capturar qualquer erro silencioso que esteja causando a tela branca.
 
----
+```typescript
+// Em App.tsx - adicionar useEffect para capturar erros
+useEffect(() => {
+  const handleRejection = (event: PromiseRejectionEvent) => {
+    console.error("Unhandled rejection:", event.reason);
+    event.preventDefault();
+  };
+  window.addEventListener("unhandledrejection", handleRejection);
+  return () => window.removeEventListener("unhandledrejection", handleRejection);
+}, []);
+```
 
-### Phase 3: Director Dashboard (Desktop Optimized)
+### Passo 2: Adicionar Error Boundary
+Criar um Error Boundary para capturar erros de renderizacao e mostrar uma mensagem util em vez de tela branca.
 
-**Layout:** Sidebar navigation with clean, professional styling
+**Novo arquivo**: `src/components/ErrorBoundary.tsx`
 
-**Pages:**
+### Passo 3: Melhorar Tratamento de Erro no AuthContext
+Adicionar try/catch mais robusto no `fetchUserData` e garantir que `isLoading` seja sempre definido como `false` mesmo em caso de erro.
 
-1. **Dashboard Home**
-   - Quick stats cards (total students, today's attendance rate, classes count)
-   - Recent attendance activity feed
-   - Alerts for low attendance
-
-2. **Student Management**
-   - Data table with search, filter by classroom, and pagination
-   - Add Student modal (name, age, classroom assignment)
-   - Edit Student inline or modal
-   - Archive Student (soft delete with confirmation)
-   - Bulk actions support
-
-3. **Classroom Management**
-   - List/create/edit classrooms
-   - View students per classroom
-
-4. **Teacher Management**
-   - View all teachers
-   - Invite new teacher (sends email invitation)
-   - Deactivate teacher accounts
-
-5. **Attendance Overview**
-   - Master table of all attendance records
-   - Filters: by classroom, by date range, by teacher who recorded
-   - Export capabilities
-
-6. **Analytics**
-   - Attendance rate charts (line/bar charts using Recharts)
-   - Per-classroom breakdown
-   - Per-student attendance trends
-   - Weekly/monthly comparisons
+### Passo 4: Adicionar Logging Temporario
+Adicionar console.logs estrategicos para entender onde o fluxo esta travando.
 
 ---
 
-### Phase 4: Teacher Interface (Mobile-First)
+## Detalhes Tecnicos
 
-**Layout:** Bottom navigation, large touch targets, optimized for phones
+### Arquivos a Modificar
 
-**Flow:**
+1. **`src/App.tsx`**
+   - Adicionar handler global para unhandled promise rejections
+   - Envolver AppRoutes com ErrorBoundary
 
-1. **Login Screen**
-   - Clean email/password form
-   - Remember me option
+2. **`src/components/ErrorBoundary.tsx`** (novo)
+   - Criar componente ErrorBoundary que mostra mensagem de erro + botao para limpar cache e recarregar
 
-2. **Class Selection**
-   - Grid/list of all classrooms
-   - Visual indicator of today's attendance status per class
+3. **`src/contexts/AuthContext.tsx`**
+   - Melhorar tratamento de erro no `fetchUserData`
+   - Garantir que `setIsLoading(false)` sempre execute
 
-3. **Take Attendance**
-   - Header showing selected class and date
-   - List of students (sorted alphabetically)
-   - For each student:
-     - Large toggle switch (Present/Absent)
-     - Time picker for arrival (defaults to current time, only enabled when present)
-   - Fixed "Submit Attendance" button at bottom
-   - Confirmation dialog before submission
+### Fluxo Apos Implementacao
 
-4. **My Stats**
-   - Simple view of attendance history for classes they've recorded
-   - Weekly summary view
+```text
+Usuario acessa "/"
+       |
+       v
+  App.tsx carrega
+       |
+       v
+  ErrorBoundary envolve tudo
+       |
+       v
+  AuthProvider inicializa
+       |
+       +-- Se erro --> ErrorBoundary captura e mostra mensagem
+       |
+       +-- Se OK --> isLoading=true mostra skeleton
+       |
+       v
+  getSession() executa
+       |
+       +-- Se nao tem sessao --> isLoading=false, redireciona /login
+       |
+       +-- Se tem sessao --> fetchUserData()
+       |
+       v
+  Mostra dashboard ou login
+```
 
 ---
 
-### Phase 5: Additional Features
+## Acao Imediata (Voce Pode Fazer Agora)
 
-- **Responsive Design:** Director dashboard works on tablets, Teacher interface works on desktop too
-- **Toast Notifications:** Feedback for all actions
-- **Loading States:** Skeleton loaders for data fetching
-- **Error Handling:** User-friendly error messages
-- **Data Validation:** Form validation with clear error messages
+Antes de eu implementar o codigo, tente isso:
 
----
+1. **Limpar cache do navegador**:
+   - Chrome: `Ctrl + Shift + Delete` -> selecione "Cookies" e "Cache" -> Limpar dados
+   
+2. **Abrir em aba anonima**:
+   - `Ctrl + Shift + N` no Chrome
+   - Acesse o site novamente
 
-### Design System (Clean & Professional)
+3. **Verificar console do navegador**:
+   - `F12` -> aba "Console"
+   - Veja se aparece algum erro vermelho
 
-- **Color Palette:** Blues and grays with a subtle accent color for actions
-- **Typography:** Clear hierarchy, readable fonts
-- **Components:** shadcn/ui components for consistency
-- **Spacing:** Generous padding for easy touch targets on mobile
+Se ainda aparecer tela branca apos essas tentativas, aprove este plano para eu implementar o Error Boundary e melhorar o tratamento de erros.
 
