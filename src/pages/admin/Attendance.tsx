@@ -162,7 +162,7 @@ export default function AdminAttendance() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Nenhum registro de frequência encontrado para os filtros selecionados.
                 </TableCell>
               </TableRow>
