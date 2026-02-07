@@ -80,11 +80,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          try {
-            await fetchUserData(session.user.id);
-          } catch (error) {
+          // IMPORTANT: don't await here, otherwise a stalled network request can freeze the UI in loading
+          fetchUserData(session.user.id).catch((error) => {
             console.error('[Auth] Error in onAuthStateChange fetchUserData:', error);
-          }
+          });
         } else {
           setProfile(null);
           setRole(null);
