@@ -27,7 +27,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Users } from 'lucide-react';
+import { Plus, Pencil, Trash2, Users, FileText } from 'lucide-react';
+import { ClassroomReportPDF } from '@/components/admin/ClassroomReportPDF';
 import type { Classroom } from '@/types/database';
 
 export default function AdminClassrooms() {
