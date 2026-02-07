@@ -27,22 +27,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (userId: string) => {
     try {
-      // Fetch profile and role in parallel
+      // Fetch profile and role in parallel (role may not exist yet)
       const [profileResult, roleResult] = await Promise.all([
         supabase
           .from('profiles')
           .select('*')
           .eq('user_id', userId)
-          .single(),
+          .maybeSingle(),
         supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userId)
-          .single()
+          .maybeSingle(),
       ]);
-      
-      setProfile(profileResult.data as Profile | null);
-      setRole(roleResult.data?.role as AppRole | null);
+
+      if (profileResult.error) throw profileResult.error;
+      if (roleResult.error) throw roleResult.error;
+
+      setProfile((profileResult.data as Profile | null) ?? null);
+      setRole((roleResult.data?.role as AppRole | null) ?? null);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
