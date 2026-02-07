@@ -75,11 +75,20 @@ export default function Login() {
     setIsSendingReset(false);
 
     if (error) {
-      toast({
-        title: 'Erro ao enviar email',
-        description: 'Não foi possível enviar o email de recuperação.',
-        variant: 'destructive',
-      });
+      // Check if it's a rate limit error
+      if (error.message?.includes('after') || error.status === 429) {
+        toast({
+          title: 'Aguarde um momento',
+          description: 'Por segurança, aguarde alguns segundos antes de tentar novamente.',
+          variant: 'default',
+        });
+      } else {
+        toast({
+          title: 'Erro ao enviar email',
+          description: 'Não foi possível enviar o email de recuperação.',
+          variant: 'destructive',
+        });
+      }
       return;
     }
 
