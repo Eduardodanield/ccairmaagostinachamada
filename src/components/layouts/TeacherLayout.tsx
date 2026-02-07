@@ -3,10 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
-import { Home, ClipboardList, BarChart2, LogOut, GraduationCap } from 'lucide-react';
+import { Home, BarChart2, LogOut, GraduationCap, Calendar } from 'lucide-react';
 
 const navItems = [
   { title: 'Turmas', url: '/teacher', icon: Home },
+  { title: 'Atividades', url: '/teacher/activities', icon: Calendar },
   { title: 'Estatísticas', url: '/teacher/stats', icon: BarChart2 },
 ];
 

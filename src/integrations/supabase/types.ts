@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          activity_date: string
+          classroom_id: string
+          created_at: string
+          description: string | null
+          id: string
+          teacher_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          activity_date: string
+          classroom_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          teacher_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          activity_date?: string
+          classroom_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          teacher_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           arrival_time: string | null

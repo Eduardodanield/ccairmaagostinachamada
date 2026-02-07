@@ -27,13 +27,15 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Users } from 'lucide-react';
+import { Plus, Pencil, Trash2, Users, FileText } from 'lucide-react';
+import { ClassroomReportPDF } from '@/components/admin/ClassroomReportPDF';
 import type { Classroom } from '@/types/database';
 
 export default function AdminClassrooms() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(null);
   const [name, setName] = useState('');
 
@@ -204,6 +206,17 @@ export default function AdminClassrooms() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    title="Gerar relatório PDF"
+                    onClick={() => {
+                      setSelectedClassroom(classroom);
+                      setIsReportOpen(true);
+                    }}
+                  >
+                    <FileText className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => openEditDialog(classroom)}
                   >
                     <Pencil className="h-4 w-4" />
@@ -282,6 +295,16 @@ export default function AdminClassrooms() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* PDF Report Dialog */}
+      {selectedClassroom && (
+        <ClassroomReportPDF
+          classroomId={selectedClassroom.id}
+          classroomName={selectedClassroom.name}
+          open={isReportOpen}
+          onOpenChange={setIsReportOpen}
+        />
+      )}
     </AdminLayout>
   );
 }

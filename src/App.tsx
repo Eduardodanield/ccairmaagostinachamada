@@ -25,6 +25,7 @@ import AdminAnalytics from "./pages/admin/Analytics";
 import TeacherHome from "./pages/teacher/Home";
 import TeacherAttendance from "./pages/teacher/TakeAttendance";
 import TeacherStats from "./pages/teacher/Stats";
+import TeacherActivities from "./pages/teacher/Activities";
 
 const queryClient = new QueryClient();
 
@@ -122,6 +123,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['teacher']}>
             <TeacherStats />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/activities"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherActivities />
           </ProtectedRoute>
         }
       />
