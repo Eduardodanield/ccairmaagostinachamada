@@ -166,7 +166,7 @@ serve(async (req) => {
 
     if (profileUpsertError) {
       console.error("[create-user] profile upsert error:", profileUpsertError);
-      return json({ error: "Falha ao salvar perfil do professor" }, 400);
+      return json({ error: "Não foi possível criar a conta do professor. Tente novamente." }, 500);
     }
 
     // Replace roles for this user (avoid duplicates)
