@@ -74,11 +74,27 @@ serve(async (req) => {
     const payload = (await req.json()) as Partial<CreateUserPayload>;
     const email = (payload.email ?? "").trim().toLowerCase();
     const password = payload.password ?? "";
-    const fullName = (payload.fullName ?? "").trim();
+    const fullName = (payload.fullName ?? "").replace(/\s+/g, " ").trim();
     const role = payload.role;
 
     if (!email || !password || !fullName) {
       return json({ error: "Dados inválidos: email, senha e nome são obrigatórios" }, 400);
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return json({ error: "Formato de email inválido" }, 400);
+    }
+
+    // Password strength validation
+    if (password.length < 6) {
+      return json({ error: "A senha deve ter pelo menos 6 caracteres" }, 400);
+    }
+
+    // Full name length validation
+    if (fullName.length < 2 || fullName.length > 100) {
+      return json({ error: "O nome deve ter entre 2 e 100 caracteres" }, 400);
     }
 
     if (role !== "teacher") {
@@ -150,7 +166,7 @@ serve(async (req) => {
 
     if (profileUpsertError) {
       console.error("[create-user] profile upsert error:", profileUpsertError);
-      return json({ error: "Falha ao salvar perfil do professor" }, 400);
+      return json({ error: "Não foi possível criar a conta do professor. Tente novamente." }, 500);
     }
 
     // Replace roles for this user (avoid duplicates)
@@ -161,7 +177,7 @@ serve(async (req) => {
 
     if (deleteRolesError) {
       console.error("[create-user] delete roles error:", deleteRolesError);
-      return json({ error: "Falha ao atualizar permissões do professor" }, 400);
+      return json({ error: "Não foi possível criar a conta do professor. Tente novamente." }, 500);
     }
 
     const { error: roleInsertError } = await supabaseAdmin
@@ -170,12 +186,12 @@ serve(async (req) => {
 
     if (roleInsertError) {
       console.error("[create-user] insert role error:", roleInsertError);
-      return json({ error: "Falha ao atribuir função de professor" }, 400);
+      return json({ error: "Não foi possível criar a conta do professor. Tente novamente." }, 500);
     }
 
     return json({ success: true, userId });
   } catch (error) {
     console.error("[create-user] unexpected error:", error);
-    return json({ error: (error as { message?: string }).message ?? "Erro inesperado" }, 500);
+    return json({ error: "Erro inesperado. Tente novamente." }, 500);
   }
 });
