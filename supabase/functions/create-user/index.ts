@@ -177,7 +177,7 @@ serve(async (req) => {
 
     if (deleteRolesError) {
       console.error("[create-user] delete roles error:", deleteRolesError);
-      return json({ error: "Falha ao atualizar permissões do professor" }, 400);
+      return json({ error: "Não foi possível criar a conta do professor. Tente novamente." }, 500);
     }
 
     const { error: roleInsertError } = await supabaseAdmin
