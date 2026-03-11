@@ -192,6 +192,6 @@ serve(async (req) => {
     return json({ success: true, userId });
   } catch (error) {
     console.error("[create-user] unexpected error:", error);
-    return json({ error: (error as { message?: string }).message ?? "Erro inesperado" }, 500);
+    return json({ error: "Erro inesperado. Tente novamente." }, 500);
   }
 });
