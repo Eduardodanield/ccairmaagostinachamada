@@ -186,7 +186,7 @@ serve(async (req) => {
 
     if (roleInsertError) {
       console.error("[create-user] insert role error:", roleInsertError);
-      return json({ error: "Falha ao atribuir função de professor" }, 400);
+      return json({ error: "Não foi possível criar a conta do professor. Tente novamente." }, 500);
     }
 
     return json({ success: true, userId });
