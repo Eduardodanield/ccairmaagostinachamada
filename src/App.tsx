@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { BugReportButton } from "@/components/BugReportButton";
 
 // Pages
 import Login from "./pages/Login";
@@ -20,6 +21,7 @@ import AdminClassrooms from "./pages/admin/Classrooms";
 import AdminTeachers from "./pages/admin/Teachers";
 import AdminAttendance from "./pages/admin/Attendance";
 import AdminAnalytics from "./pages/admin/Analytics";
+import AdminBugReports from "./pages/admin/BugReports";
 
 // Teacher Pages
 import TeacherHome from "./pages/teacher/Home";
@@ -99,9 +101,16 @@ function AppRoutes() {
             <AdminAnalytics />
           </ProtectedRoute>
         }
-      />
+        />
+        <Route
+          path="/admin/bug-reports"
+          element={
+            <ProtectedRoute allowedRoles={['director']}>
+              <AdminBugReports />
+            </ProtectedRoute>
+          }
+        />
       
-      {/* Teacher Routes */}
       <Route
         path="/teacher"
         element={
@@ -166,6 +175,7 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <AppRoutes />
+              <BugReportButton />
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>

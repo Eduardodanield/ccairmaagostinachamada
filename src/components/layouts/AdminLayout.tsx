@@ -13,9 +13,10 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings,
+  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings, Bug,
 } from 'lucide-react';
 import { ManualDialog } from '@/components/ManualDialog';
+import { BackupCleanupDialog } from '@/components/BackupCleanupDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,6 +27,7 @@ const navItems = [
   { title: 'Professores', url: '/admin/teachers', icon: UserCog },
   { title: 'Frequência', url: '/admin/attendance', icon: ClipboardList },
   { title: 'Relatórios', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'Erros', url: '/admin/bug-reports', icon: Bug },
 ];
 
 function AdminSidebar() {
@@ -131,6 +133,7 @@ function AdminSidebar() {
           </div>
           <div className="flex flex-col gap-1">
             <ManualDialog variant="admin" />
+            <BackupCleanupDialog />
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <DialogTrigger asChild>
                 <Button
