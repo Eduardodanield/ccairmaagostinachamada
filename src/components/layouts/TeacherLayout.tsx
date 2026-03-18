@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { Home, BarChart2, LogOut, GraduationCap, Calendar } from 'lucide-react';
+import { ManualDialog } from '@/components/ManualDialog';
 
 const navItems = [
   { title: 'Turmas', url: '/teacher', icon: Home },
