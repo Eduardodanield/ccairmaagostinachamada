@@ -215,6 +215,35 @@ export type Database = {
           },
         ]
       }
+      teacher_classrooms: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          id: string
+          teacher_id: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          id?: string
+          teacher_id: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_classrooms_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
