@@ -132,6 +132,7 @@ function AdminSidebar() {
           </div>
           <div className="flex flex-col gap-1">
             <ManualDialog variant="admin" />
+            <BackupCleanupDialog />
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <DialogTrigger asChild>
                 <Button

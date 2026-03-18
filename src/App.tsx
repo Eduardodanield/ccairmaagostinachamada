@@ -167,6 +167,7 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <AppRoutes />
+              <BugReportButton />
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
