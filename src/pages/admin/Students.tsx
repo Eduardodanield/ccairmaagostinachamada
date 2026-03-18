@@ -95,7 +95,7 @@ export default function AdminStudents() {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (data: Record<string, unknown>) => {
+    mutationFn: async (data: { name: string; age: number; classroom_id: string | null; birth_date: string | null; mother_name: string | null; parents_phone: string | null; rg: string | null; cpf: string | null; gender: string | null; teacher_name: string | null; entry_time: string | null; exit_time: string | null }) => {
       const { error } = await supabase.from('students').insert([data]);
       if (error) throw error;
     },
