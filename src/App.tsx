@@ -101,9 +101,16 @@ function AppRoutes() {
             <AdminAnalytics />
           </ProtectedRoute>
         }
-      />
+        />
+        <Route
+          path="/admin/bug-reports"
+          element={
+            <ProtectedRoute allowedRoles={['director']}>
+              <AdminBugReports />
+            </ProtectedRoute>
+          }
+        />
       
-      {/* Teacher Routes */}
       <Route
         path="/teacher"
         element={

@@ -27,6 +27,7 @@ const navItems = [
   { title: 'Professores', url: '/admin/teachers', icon: UserCog },
   { title: 'Frequência', url: '/admin/attendance', icon: ClipboardList },
   { title: 'Relatórios', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'Erros', url: '/admin/bug-reports', icon: Bug },
 ];
 
 function AdminSidebar() {
