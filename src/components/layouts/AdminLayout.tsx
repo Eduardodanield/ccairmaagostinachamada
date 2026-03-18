@@ -16,6 +16,7 @@ import {
   LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings,
 } from 'lucide-react';
 import { ManualDialog } from '@/components/ManualDialog';
+import { BackupCleanupDialog } from '@/components/BackupCleanupDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
