@@ -45,6 +45,10 @@ export function TeacherLayout({ children, title, showBack, onBack }: TeacherLayo
             </div>
           )}
           <h1 className="text-lg font-semibold flex-1">{title}</h1>
+          <ManualDialog
+            variant="teacher"
+            triggerClassName="text-muted-foreground hover:text-foreground"
+          />
           <Button variant="ghost" size="icon" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" />
           </Button>
