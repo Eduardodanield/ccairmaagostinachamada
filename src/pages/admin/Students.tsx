@@ -111,7 +111,7 @@ export default function AdminStudents() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: { name: string; age: number; classroom_id: string | null; birth_date: string | null; mother_name: string | null; parents_phone: string | null; rg: string | null; cpf: string | null; gender: string | null; teacher_name: string | null; entry_time: string | null; exit_time: string | null } }) => {
       const { error } = await supabase.from('students').update(data).eq('id', id);
       if (error) throw error;
     },
