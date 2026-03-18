@@ -227,7 +227,7 @@ export default function AdminStudents() {
 
         for (const sheetName of workbook.SheetNames) {
           const sheet = workbook.Sheets[sheetName];
-          const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { header: 1 }) as unknown[][];
+          const json = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as unknown[][];
 
           for (const row of json) {
             if (!Array.isArray(row) || row.length < 2) continue;
