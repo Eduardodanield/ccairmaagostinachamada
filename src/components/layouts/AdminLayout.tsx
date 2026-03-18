@@ -130,14 +130,7 @@ function AdminSidebar() {
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-muted-foreground hover:text-sidebar-foreground"
-              onClick={generateManualPDF}
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Baixar Manual PDF
-            </Button>
+            <ManualDialog variant="admin" />
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <DialogTrigger asChild>
                 <Button
