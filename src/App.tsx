@@ -21,6 +21,7 @@ import AdminClassrooms from "./pages/admin/Classrooms";
 import AdminTeachers from "./pages/admin/Teachers";
 import AdminAttendance from "./pages/admin/Attendance";
 import AdminAnalytics from "./pages/admin/Analytics";
+import AdminBugReports from "./pages/admin/BugReports";
 
 // Teacher Pages
 import TeacherHome from "./pages/teacher/Home";
