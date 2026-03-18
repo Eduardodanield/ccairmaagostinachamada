@@ -13,9 +13,9 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings, BookOpen,
+  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings,
 } from 'lucide-react';
-import { generateManualPDF } from '@/utils/generateManualPDF';
+import { ManualDialog } from '@/components/ManualDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
