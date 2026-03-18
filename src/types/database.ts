@@ -22,6 +22,7 @@ export interface UserRole {
 export interface Classroom {
   id: string;
   name: string;
+  shift: string | null;
   created_at: string;
   updated_at: string;
 }
