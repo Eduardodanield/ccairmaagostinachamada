@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { TeacherLayout } from '@/components/layouts/TeacherLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,23 +9,36 @@ import { Badge } from '@/components/ui/badge';
 import { Users, CheckCircle2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import type { Classroom } from '@/types/database';
 
 export default function TeacherHome() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const { data: classrooms, isLoading } = useQuery({
-    queryKey: ['classrooms-with-status', today],
+    queryKey: ['teacher-classrooms-with-status', today, user?.id],
     queryFn: async () => {
+      if (!user) return [];
+
+      // Get assigned classroom IDs for this teacher
+      const { data: assignments, error: assignError } = await supabase
+        .from('teacher_classrooms')
+        .select('classroom_id')
+        .eq('teacher_id', user.id);
+
+      if (assignError) throw assignError;
+      if (!assignments || assignments.length === 0) return [];
+
+      const classroomIds = assignments.map(a => a.classroom_id);
+
       const { data: classroomsData, error: classroomsError } = await supabase
         .from('classrooms')
         .select('*')
+        .in('id', classroomIds)
         .order('name');
       
       if (classroomsError) throw classroomsError;
 
-      // Get student counts and today's attendance status for each classroom
       const results = await Promise.all(
         classroomsData.map(async (classroom) => {
           const { data: students } = await supabase
@@ -58,6 +72,7 @@ export default function TeacherHome() {
 
       return results;
     },
+    enabled: !!user,
   });
 
   const handleSelectClass = (classroomId: string) => {
@@ -65,7 +80,7 @@ export default function TeacherHome() {
   };
 
   return (
-    <TeacherLayout title="Selecionar Turma">
+    <TeacherLayout title="Minha Sala">
       <div className="p-4">
         <p className="text-muted-foreground mb-4">
           {format(new Date(), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })}
@@ -73,7 +88,7 @@ export default function TeacherHome() {
 
         {isLoading ? (
           <div className="space-y-4">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(2)].map((_, i) => (
               <Card key={i}>
                 <CardHeader>
                   <Skeleton className="h-6 w-32" />
@@ -124,7 +139,7 @@ export default function TeacherHome() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground text-center">
-                Nenhuma turma disponível. Por favor, entre em contato com o administrador.
+                Nenhuma sala atribuída. Entre em contato com o administrador para ser designado a uma sala.
               </p>
             </CardContent>
           </Card>

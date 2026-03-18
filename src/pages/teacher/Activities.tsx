@@ -9,34 +9,19 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Calendar, BookOpen } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isWeekend } from 'date-fns';
+import { Plus, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday, isWeekend } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface Activity {
@@ -74,13 +59,19 @@ export default function TeacherActivities() {
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
+  // Only fetch classrooms assigned to this teacher
   const { data: classrooms, isLoading: isLoadingClassrooms } = useQuery({
-    queryKey: ['classrooms'],
+    queryKey: ['teacher-assigned-classrooms', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('classrooms').select('id, name').order('name');
-      if (error) throw error;
-      return data;
+      if (!user) return [];
+      const { data: assignments, error: assignError } = await supabase
+        .from('teacher_classrooms')
+        .select('classroom_id, classroom:classrooms(id, name)')
+        .eq('teacher_id', user.id);
+      if (assignError) throw assignError;
+      return (assignments as any[])?.map(a => a.classroom).filter(Boolean) || [];
     },
+    enabled: !!user,
   });
 
   const { data: activities, isLoading: isLoadingActivities } = useQuery({
@@ -95,12 +86,15 @@ export default function TeacherActivities() {
 
       if (selectedClassroom !== 'all') {
         query = query.eq('classroom_id', selectedClassroom);
+      } else if (classrooms && classrooms.length > 0) {
+        query = query.in('classroom_id', classrooms.map(c => c.id));
       }
 
       const { data, error } = await query;
       if (error) throw error;
       return data as Activity[];
     },
+    enabled: !!classrooms,
   });
 
   const addMutation = useMutation({
@@ -122,10 +116,7 @@ export default function TeacherActivities() {
     },
     onError: (error: Error) => {
       if (error.message.includes('duplicate')) {
-        toast({
-          title: 'Já existe uma atividade para esta data e sala',
-          variant: 'destructive',
-        });
+        toast({ title: 'Já existe uma atividade para esta data e sala', variant: 'destructive' });
       } else {
         toast({ title: 'Falha ao adicionar atividade', description: error.message, variant: 'destructive' });
       }
@@ -186,10 +177,7 @@ export default function TeacherActivities() {
     if (!selectedActivity) return;
     updateMutation.mutate({
       id: selectedActivity.id,
-      data: {
-        title: formData.title,
-        description: formData.description || null,
-      },
+      data: { title: formData.title, description: formData.description || null },
     });
   };
 
@@ -198,7 +186,7 @@ export default function TeacherActivities() {
     setFormData({
       ...formData,
       activity_date: format(date, 'yyyy-MM-dd'),
-      classroom_id: selectedClassroom !== 'all' ? selectedClassroom : '',
+      classroom_id: selectedClassroom !== 'all' ? selectedClassroom : (classrooms?.[0]?.id || ''),
     });
     setIsAddOpen(true);
   };
@@ -225,34 +213,29 @@ export default function TeacherActivities() {
   return (
     <TeacherLayout title="Cronograma de Atividades">
       <div className="p-4 space-y-4">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={prevMonth}>
-              ←
-            </Button>
+            <Button variant="outline" size="sm" onClick={prevMonth}>←</Button>
             <span className="font-medium min-w-[140px] text-center">
               {format(currentMonth, "MMMM 'de' yyyy", { locale: ptBR })}
             </span>
-            <Button variant="outline" size="sm" onClick={nextMonth}>
-              →
-            </Button>
+            <Button variant="outline" size="sm" onClick={nextMonth}>→</Button>
           </div>
 
           <div className="flex gap-2">
-            <Select value={selectedClassroom} onValueChange={setSelectedClassroom}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Filtrar sala" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as Salas</SelectItem>
-                {classrooms?.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {classrooms && classrooms.length > 1 && (
+              <Select value={selectedClassroom} onValueChange={setSelectedClassroom}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Filtrar sala" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Salas</SelectItem>
+                  {classrooms.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
             <Button onClick={() => { resetForm(); setIsAddOpen(true); }}>
               <Plus className="h-4 w-4 mr-2" />
@@ -261,7 +244,6 @@ export default function TeacherActivities() {
           </div>
         </div>
 
-        {/* Calendar Grid */}
         {isLoadingActivities || isLoadingClassrooms ? (
           <div className="grid grid-cols-7 gap-2">
             {[...Array(35)].map((_, i) => (
@@ -270,16 +252,13 @@ export default function TeacherActivities() {
           </div>
         ) : (
           <>
-            {/* Weekday headers */}
             <div className="grid grid-cols-7 gap-2 text-center text-sm font-medium text-muted-foreground">
               {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
                 <div key={day} className="py-2">{day}</div>
               ))}
             </div>
 
-            {/* Days */}
             <div className="grid grid-cols-7 gap-2">
-              {/* Empty cells for days before month starts */}
               {[...Array(monthStart.getDay())].map((_, i) => (
                 <div key={`empty-${i}`} className="h-24 rounded-lg bg-muted/30" />
               ))}
@@ -287,18 +266,18 @@ export default function TeacherActivities() {
               {daysInMonth.map((day) => {
                 const dayActivities = getActivityForDay(day);
                 const weekend = isWeekend(day);
-                const today = isToday(day);
+                const todayCheck = isToday(day);
 
                 return (
                   <Card
                     key={day.toISOString()}
                     className={`h-24 overflow-hidden cursor-pointer transition-colors hover:bg-muted/50 ${
                       weekend ? 'bg-muted/40' : ''
-                    } ${today ? 'ring-2 ring-primary' : ''}`}
+                    } ${todayCheck ? 'ring-2 ring-primary' : ''}`}
                     onClick={() => !weekend && openAddDialogForDate(day)}
                   >
                     <CardHeader className="p-2 pb-0">
-                      <span className={`text-sm font-medium ${today ? 'text-primary' : ''}`}>
+                      <span className={`text-sm font-medium ${todayCheck ? 'text-primary' : ''}`}>
                         {format(day, 'd')}
                       </span>
                     </CardHeader>
@@ -307,10 +286,7 @@ export default function TeacherActivities() {
                         <div
                           key={activity.id}
                           className="text-xs bg-primary/10 text-primary rounded px-1 py-0.5 truncate cursor-pointer hover:bg-primary/20"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditDialog(activity);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); openEditDialog(activity); }}
                           title={`${activity.classroom?.name}: ${activity.title}`}
                         >
                           {activity.title}
@@ -327,33 +303,23 @@ export default function TeacherActivities() {
           </>
         )}
 
-        {/* Activities list for the month */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
               Atividades do Mês
             </CardTitle>
-            <CardDescription>
-              {activities?.length || 0} atividade(s) programada(s)
-            </CardDescription>
+            <CardDescription>{activities?.length || 0} atividade(s) programada(s)</CardDescription>
           </CardHeader>
           <CardContent>
             {activities && activities.length > 0 ? (
               <div className="space-y-2">
                 {activities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                  >
+                  <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-3">
                       <div className="text-center min-w-[50px]">
-                        <p className="text-lg font-bold text-primary">
-                          {format(new Date(activity.activity_date), 'dd')}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(activity.activity_date), 'EEE', { locale: ptBR })}
-                        </p>
+                        <p className="text-lg font-bold text-primary">{format(new Date(activity.activity_date), 'dd')}</p>
+                        <p className="text-xs text-muted-foreground">{format(new Date(activity.activity_date), 'EEE', { locale: ptBR })}</p>
                       </div>
                       <div>
                         <p className="font-medium">{activity.title}</p>
@@ -367,14 +333,7 @@ export default function TeacherActivities() {
                       <Button variant="ghost" size="icon" onClick={() => openEditDialog(activity)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          setSelectedActivity(activity);
-                          setIsDeleteOpen(true);
-                        }}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => { setSelectedActivity(activity); setIsDeleteOpen(true); }}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -400,51 +359,28 @@ export default function TeacherActivities() {
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="add-classroom">Sala *</Label>
-              <Select
-                value={formData.classroom_id}
-                onValueChange={(value) => setFormData({ ...formData, classroom_id: value })}
-              >
+              <Select value={formData.classroom_id} onValueChange={(value) => setFormData({ ...formData, classroom_id: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a sala" />
                 </SelectTrigger>
                 <SelectContent>
                   {classrooms?.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-date">Data *</Label>
-              <Input
-                id="add-date"
-                type="date"
-                value={formData.activity_date}
-                onChange={(e) => setFormData({ ...formData, activity_date: e.target.value })}
-                required
-              />
+              <Input id="add-date" type="date" value={formData.activity_date} onChange={(e) => setFormData({ ...formData, activity_date: e.target.value })} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-title">Título *</Label>
-              <Input
-                id="add-title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Ex: Aula de Pintura"
-                required
-              />
+              <Input id="add-title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Ex: Aula de Pintura" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-description">Descrição (opcional)</Label>
-              <Textarea
-                id="add-description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Detalhes da atividade..."
-                rows={3}
-              />
+              <Textarea id="add-description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Detalhes da atividade..." rows={3} />
             </div>
             <DialogFooter>
               <Button type="submit" disabled={addMutation.isPending || !formData.classroom_id}>
@@ -469,33 +405,25 @@ export default function TeacherActivities() {
             </div>
             <div className="space-y-2">
               <Label>Data</Label>
-              <Input
-                value={selectedActivity?.activity_date ? format(new Date(selectedActivity.activity_date), 'dd/MM/yyyy') : ''}
-                disabled
-              />
+              <Input value={selectedActivity?.activity_date ? format(new Date(selectedActivity.activity_date), 'dd/MM/yyyy') : ''} disabled />
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-title">Título *</Label>
-              <Input
-                id="edit-title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-              />
+              <Input id="edit-title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-description">Descrição</Label>
-              <Textarea
-                id="edit-description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-              />
+              <Label htmlFor="edit-description">Descrição (opcional)</Label>
+              <Textarea id="edit-description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
-              </Button>
+              <div className="flex gap-2 w-full justify-between">
+                <Button type="button" variant="destructive" size="sm" onClick={() => { setIsEditOpen(false); setIsDeleteOpen(true); }}>
+                  <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                </Button>
+                <Button type="submit" disabled={updateMutation.isPending}>
+                  {updateMutation.isPending ? 'Salvando...' : 'Salvar'}
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -505,17 +433,14 @@ export default function TeacherActivities() {
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Atividade?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir Atividade</AlertDialogTitle>
             <AlertDialogDescription>
-              Isso irá excluir "{selectedActivity?.title}". Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir "{selectedActivity?.title}"? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedActivity && deleteMutation.mutate(selectedActivity.id)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => selectedActivity && deleteMutation.mutate(selectedActivity.id)}>
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
