@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { Home, BarChart2, LogOut, GraduationCap, Calendar } from 'lucide-react';
+import { ManualDialog } from '@/components/ManualDialog';
 
 const navItems = [
   { title: 'Turmas', url: '/teacher', icon: Home },
@@ -44,6 +45,10 @@ export function TeacherLayout({ children, title, showBack, onBack }: TeacherLayo
             </div>
           )}
           <h1 className="text-lg font-semibold flex-1">{title}</h1>
+          <ManualDialog
+            variant="teacher"
+            triggerClassName="text-muted-foreground hover:text-foreground"
+          />
           <Button variant="ghost" size="icon" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" />
           </Button>

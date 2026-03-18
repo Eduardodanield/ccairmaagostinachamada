@@ -13,9 +13,9 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings, BookOpen,
+  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings,
 } from 'lucide-react';
-import { generateManualPDF } from '@/utils/generateManualPDF';
+import { ManualDialog } from '@/components/ManualDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -130,14 +130,7 @@ function AdminSidebar() {
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-muted-foreground hover:text-sidebar-foreground"
-              onClick={generateManualPDF}
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Baixar Manual PDF
-            </Button>
+            <ManualDialog variant="admin" />
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
               <DialogTrigger asChild>
                 <Button
