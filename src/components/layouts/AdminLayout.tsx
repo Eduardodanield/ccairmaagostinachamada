@@ -1,31 +1,22 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
-  LayoutDashboard,
-  Users,
-  School,
-  UserCog,
-  ClipboardList,
-  BarChart3,
-  LogOut,
-  GraduationCap,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  LayoutDashboard, Users, School, UserCog, ClipboardList, BarChart3, LogOut, GraduationCap, Settings,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const navItems = [
   { title: 'Painel', url: '/admin', icon: LayoutDashboard },
@@ -39,11 +30,63 @@ const navItems = [
 function AdminSidebar() {
   const { signOut, profile } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { toast } = useToast();
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newName, setNewName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const handleOpenEdit = () => {
+    setNewEmail(profile?.email || '');
+    setNewName(profile?.full_name || '');
+    setNewPassword('');
+    setIsEditOpen(true);
+  };
+
+  const handleSaveCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    try {
+      const body: Record<string, string> = {};
+      if (newEmail && newEmail !== profile?.email) body.email = newEmail;
+      if (newPassword) body.password = newPassword;
+      if (newName && newName !== profile?.full_name) body.fullName = newName;
+
+      if (Object.keys(body).length === 0) {
+        toast({ title: 'Nenhuma alteração detectada' });
+        setIsEditOpen(false);
+        setIsSaving(false);
+        return;
+      }
+
+      const { data: result, error } = await supabase.functions.invoke('update-admin-credentials', { body });
+
+      if (error) throw error;
+      if (result?.error) throw new Error(result.error);
+
+      toast({ title: 'Credenciais atualizadas com sucesso', description: 'Faça login novamente com as novas credenciais.' });
+      setIsEditOpen(false);
+
+      // Sign out so the admin re-logs with new credentials
+      if (body.email || body.password) {
+        await signOut();
+        navigate('/login');
+      } else {
+        window.location.reload();
+      }
+    } catch (err: any) {
+      toast({ title: 'Erro ao atualizar', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -85,14 +128,55 @@ function AdminSidebar() {
               {profile?.email}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-muted-foreground hover:text-destructive"
-            onClick={handleSignOut}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-muted-foreground hover:text-sidebar-foreground"
+                  onClick={handleOpenEdit}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Editar Credenciais
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Editar Credenciais</DialogTitle>
+                  <DialogDescription>
+                    Altere seu nome, email ou senha. Após alterar email ou senha, você será desconectado.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSaveCredentials} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="adminName">Nome</Label>
+                    <Input id="adminName" value={newName} onChange={(e) => setNewName(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="adminEmail">Email</Label>
+                    <Input id="adminEmail" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="adminPassword">Nova Senha</Label>
+                    <Input id="adminPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Deixe vazio para manter" minLength={6} />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" disabled={isSaving}>
+                      {isSaving ? 'Salvando...' : 'Salvar'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-muted-foreground hover:text-destructive"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
       </SidebarContent>
     </Sidebar>
