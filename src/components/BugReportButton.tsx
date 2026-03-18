@@ -19,6 +19,12 @@ export function BugReportButton() {
   const [isSending, setIsSending] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
+
+  // Don't show on login/reset pages
+  if (!user || location.pathname === '/login' || location.pathname === '/reset-password') {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
