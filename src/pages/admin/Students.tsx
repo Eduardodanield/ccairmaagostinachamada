@@ -534,21 +534,19 @@ export default function AdminStudents() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Aluno</DialogTitle>
             <DialogDescription>Atualize os dados do aluno.</DialogDescription>
           </DialogHeader>
-          <ScrollArea className="flex-1 overflow-y-auto pr-4">
-            <form onSubmit={handleEdit}>
-              <StudentFormFields />
-              <DialogFooter className="mt-4">
-                <Button type="submit" disabled={updateMutation.isPending}>
-                  {updateMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </ScrollArea>
+          <form onSubmit={handleEdit}>
+            <StudentFormFields />
+            <DialogFooter className="mt-4">
+              <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
