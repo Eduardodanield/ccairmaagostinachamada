@@ -308,79 +308,77 @@ export default function AdminStudents() {
   });
 
   const StudentFormFields = () => (
-    <ScrollArea className="max-h-[60vh] pr-4">
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nome *</Label>
-            <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="age">Idade *</Label>
-            <Input id="age" type="number" min="1" max="99" value={formData.age} onChange={(e) => setFormData({ ...formData, age: e.target.value })} required />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="birth_date">Data de Nascimento</Label>
-            <Input id="birth_date" type="date" value={formData.birth_date} onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="gender">Sexo</Label>
-            <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="masculino">Masculino</SelectItem>
-                <SelectItem value="feminino">Feminino</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="rg">RG</Label>
-            <Input id="rg" value={formData.rg} onChange={(e) => setFormData({ ...formData, rg: e.target.value })} placeholder="00.000.000-0" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cpf">CPF</Label>
-            <Input id="cpf" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} placeholder="000.000.000-00" />
-          </div>
+    <div className="space-y-4 px-1">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Nome *</Label>
+          <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="mother_name">Nome da Mãe</Label>
-          <Input id="mother_name" value={formData.mother_name} onChange={(e) => setFormData({ ...formData, mother_name: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="parents_phone">Telefone dos Pais</Label>
-          <Input id="parents_phone" value={formData.parents_phone} onChange={(e) => setFormData({ ...formData, parents_phone: e.target.value })} placeholder="(11) 99999-9999" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="classroom">Sala</Label>
-            <Select value={formData.classroom_id} onValueChange={(value) => setFormData({ ...formData, classroom_id: value })}>
-              <SelectTrigger><SelectValue placeholder="Selecione uma sala" /></SelectTrigger>
-              <SelectContent>
-                {classrooms?.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}{c.shift ? ` (${c.shift})` : ''}</SelectItem>))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="teacher_name">Nome do Professor</Label>
-            <Input id="teacher_name" value={formData.teacher_name} onChange={(e) => setFormData({ ...formData, teacher_name: e.target.value })} />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="entry_time">Horário de Entrada</Label>
-            <Input id="entry_time" type="time" value={formData.entry_time} onChange={(e) => setFormData({ ...formData, entry_time: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="exit_time">Horário de Saída</Label>
-            <Input id="exit_time" type="time" value={formData.exit_time} onChange={(e) => setFormData({ ...formData, exit_time: e.target.value })} />
-          </div>
+          <Label htmlFor="age">Idade *</Label>
+          <Input id="age" type="number" min="1" max="99" value={formData.age} onChange={(e) => setFormData({ ...formData, age: e.target.value })} required />
         </div>
       </div>
-    </ScrollArea>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="birth_date">Data de Nascimento</Label>
+          <Input id="birth_date" type="date" value={formData.birth_date} onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="gender">Sexo</Label>
+          <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
+            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="masculino">Masculino</SelectItem>
+              <SelectItem value="feminino">Feminino</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="rg">RG</Label>
+          <Input id="rg" value={formData.rg} onChange={(e) => setFormData({ ...formData, rg: e.target.value })} placeholder="00.000.000-0" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="cpf">CPF</Label>
+          <Input id="cpf" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} placeholder="000.000.000-00" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="mother_name">Nome da Mãe</Label>
+        <Input id="mother_name" value={formData.mother_name} onChange={(e) => setFormData({ ...formData, mother_name: e.target.value })} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="parents_phone">Telefone dos Pais</Label>
+        <Input id="parents_phone" value={formData.parents_phone} onChange={(e) => setFormData({ ...formData, parents_phone: e.target.value })} placeholder="(11) 99999-9999" />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="classroom">Sala</Label>
+          <Select value={formData.classroom_id} onValueChange={(value) => setFormData({ ...formData, classroom_id: value })}>
+            <SelectTrigger><SelectValue placeholder="Selecione uma sala" /></SelectTrigger>
+            <SelectContent>
+              {classrooms?.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}{c.shift ? ` (${c.shift})` : ''}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="teacher_name">Nome do Professor</Label>
+          <Input id="teacher_name" value={formData.teacher_name} onChange={(e) => setFormData({ ...formData, teacher_name: e.target.value })} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="entry_time">Horário de Entrada</Label>
+          <Input id="entry_time" type="time" value={formData.entry_time} onChange={(e) => setFormData({ ...formData, entry_time: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="exit_time">Horário de Saída</Label>
+          <Input id="exit_time" type="time" value={formData.exit_time} onChange={(e) => setFormData({ ...formData, exit_time: e.target.value })} />
+        </div>
+      </div>
+    </div>
   );
 
   return (
@@ -416,7 +414,7 @@ export default function AdminStudents() {
                 Adicionar Aluno
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Aluno</DialogTitle>
                 <DialogDescription>Preencha os dados do aluno abaixo.</DialogDescription>
