@@ -101,6 +101,9 @@ export default function AdminStudents() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      setFilterClassroom('all');
+      setSearchQuery('');
       setIsAddOpen(false);
       resetForm();
       toast({ title: 'Aluno adicionado com sucesso' });
